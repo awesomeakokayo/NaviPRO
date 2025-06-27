@@ -13,7 +13,7 @@
         </div>
 
         <div class="right">
-            <img class="logo" src="Frame 3.png" alt="Logo">
+            <img class="logo" src="navipro.png" alt="Logo">
             <h1>Create your account</h1>
             <p class="cta">Smarter decisions for your next career move</p>
             
@@ -27,28 +27,113 @@
                     <span>or</span>
                 </div>
                 
-                <form class="form-section">
+                <form>
                     <div class="name-row">
-                        <input class="form-input" type="text" placeholder="First name" required>
-                        <input class="form-input" type="text" placeholder="Last name" required>
+                        <input id="firstname" class="form-input" type="text" placeholder="First name" required>
+                        <input id="lastname" class="form-input" type="text" placeholder="Last name" required>
                     </div>
-                    <input class="form-input" type="email" placeholder="Email" required>
-                    <input class="form-input" type="password" placeholder="Password" required>
-                    <input class="form-input" type="password" placeholder="Confirm Password" required>
+                    <input id="email" class="form-input" type="email" placeholder="example@domain.com" required>
+
+                    <div class="password-container">
+                        <input id="password" class="form-input" type="password" placeholder="Password" minlength="8" required>
+                        <button type="button" class="password-toggle" onclick="togglePassword('password', this)">
+                            <span class="eye-open"></span>
+                        </button>
+                    </div>
+                    
+                    <!-- Confirm password field with toggle -->
+                    <div class="password-container">
+                        <input id="confirmpassword" class="form-input" type="password" placeholder="Confirm Password" minlength="8" required>
+                        <button type="button" class="password-toggle" onclick="togglePassword('confirmpassword', this)">
+                            <span class="eye-open"></span>
+                        </button>
+                    </div>
+
+                    <div class="checkbox-container">
+                        <input type="checkbox" id="terms" required>
+                        <label for="terms">I agree to the <a href="#">Terms & Conditions</a></label>
+                    </div>
+    
+                    <button class="submit" type="submit">Get started</button>
+    
+                    <p class="login-link">
+                        Already have an account? <a href="#">Log in</a>
+                    </p>
                 </form>
                 
-                <div class="checkbox-container">
-                    <input type="checkbox" id="terms" required>
-                    <label for="terms">I agree to the <a href="#">Terms & Conditions</a></label>
-                </div>
-
-                <button class="submit" type="submit">Get started</button>
-
-                <p class="login-link">
-                    Already have an account? <a href="#">Log in</a>
-                </p>
+                
             </div>
         </div>
     </div>
+
+    <script>
+
+        // Example POST request from frontend
+        fetch('https://naviproai.render.com/api/register', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            firstname: 'John',
+            lastname: 'Doe',
+            email: 'john@example.com',
+            password: 'securePassword',
+        }),
+        })
+        .then(res => res.json())
+        .then(data => {
+        console.log('Success:', data);
+        })
+        .catch(err => {
+        console.error('Error:', err);
+        });
+
+        function togglePassword(inputId, toggleButton) {
+            const passwordInput = document.getElementById(inputId);
+            const eyeIcon = toggleButton.querySelector('span');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                eyeIcon.className = 'eye-closed';
+            } else {
+                passwordInput.type = 'password';
+                eyeIcon.className = 'eye-open';
+            }
+        }
+        // Add a form collector
+        const form = document.querySelector('form');
+
+        // Add an event listener to the form 
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            //get element from the form
+            const firstname = document.getElementById('firstname').value;
+            const lastname = document.getElementById('lastname').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmpassword').value;
+
+            //confirm if password is equal to confirm password
+
+            if (password !== confirmPassword) {
+                alert("Passwords don't match")
+                return;
+            }
+
+            if (!firstname) {
+                alert('firstname is required')
+            }
+
+            if (!lastname) {
+                alert('lastname is required')
+            }
+
+            // If everything is fine, redirect to verification page
+            window.location.href = "email-verification.html"; // Change to your actual page
+
+        })
+    </script>
 </body>
 </html>
