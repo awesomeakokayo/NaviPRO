@@ -68,72 +68,91 @@
 
     <script>
 
-        // Example POST request from frontend
-        fetch('https://naviproai.render.com/api/register', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-            firstname: 'John',
-            lastname: 'Doe',
-            email: 'john@example.com',
-            password: 'securePassword',
-        }),
-        })
-        .then(res => res.json())
-        .then(data => {
-        console.log('Success:', data);
-        })
-        .catch(err => {
-        console.error('Error:', err);
+       // Password visibility toggle
+function togglePassword(inputId, toggleButton) {
+    const passwordInput = document.getElementById(inputId);
+    const eyeIcon = toggleButton.querySelector('span');
+
+    if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        eyeIcon.className = 'eye-closed';
+    } else {
+        passwordInput.type = 'password';
+        eyeIcon.className = 'eye-open';
+    }
+}
+
+// Handle form submission
+const form = document.querySelector('form');
+
+form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    // Get input values
+    const firstname = document.getElementById('firstname').value.trim();
+    const lastname = document.getElementById('lastname').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value.trim();
+    const confirmPassword = document.getElementById('confirmpassword').value.trim();
+
+    // Frontend validations
+    if (!firstname) {
+        alert('First name is required');
+        return;
+    }
+
+    if (!lastname) {
+        alert('Last name is required');
+        return;
+    }
+
+    if (!email) {
+        alert('Email is required');
+        return;
+    }
+
+    if (!password) {
+        alert('Password is required');
+        return;
+    }
+
+    if (password !== confirmPassword) {
+        alert("Passwords don't match");
+        return;
+    }
+
+    // Combine names
+    const fullName = `${firstname} ${lastname}`;
+
+    // Send data to backend
+    try {
+        const response = await fetch('https://naviproai.onrender.com/auth/register', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                name: fullName,
+                email: email,
+                password: password,
+            }),
         });
 
-        function togglePassword(inputId, toggleButton) {
-            const passwordInput = document.getElementById(inputId);
-            const eyeIcon = toggleButton.querySelector('span');
-            
-            if (passwordInput.type === 'password') {
-                passwordInput.type = 'text';
-                eyeIcon.className = 'eye-closed';
-            } else {
-                passwordInput.type = 'password';
-                eyeIcon.className = 'eye-open';
-            }
+        const data = await response.json();
+
+        if (response.ok) {
+            alert('Registration successful!');
+            // Redirect to verification page or login
+            window.location.href = 'email-verification.html'; // Replace with your actual page
+        } else {
+            alert(data.message || 'Registration failed. Please try again.');
         }
-        // Add a form collector
-        const form = document.querySelector('form');
+    } catch (error) {
+        console.error('Error during registration:', error);
+        alert("An error occurred. Please try again later.");
+    }
+});
 
-        // Add an event listener to the form 
-        form.addEventListener('submit', (e) => {
-            e.preventDefault();
-
-            //get element from the form
-            const firstname = document.getElementById('firstname').value;
-            const lastname = document.getElementById('lastname').value;
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            const confirmPassword = document.getElementById('confirmpassword').value;
-
-            //confirm if password is equal to confirm password
-
-            if (password !== confirmPassword) {
-                alert("Passwords don't match")
-                return;
-            }
-
-            if (!firstname) {
-                alert('firstname is required')
-            }
-
-            if (!lastname) {
-                alert('lastname is required')
-            }
-
-            // If everything is fine, redirect to verification page
-            window.location.href = "email-verification.html"; // Change to your actual page
-
-        })
     </script>
 </body>
 </html>
