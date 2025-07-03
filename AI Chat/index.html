@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
+  <style>
+     @import url('https://fonts.googleapis.com/css2?family=Allura&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+  </style>
+  <title>Navi</title>
+</head>
+<body>
+  
+  <div class="top-div">
+    <div></div>
+
+    <div> <a class="dashboard-link" href="#">Go to dashboard →</a> </div>
+  </div>
+
+  <div class="container">
+    <div class="direct-message">
+      <!-- AI message block -->
+      <div class="chat-container">
+        <div>
+          <img src="Images/Frame 3.png" alt="logo">
+        </div>
+        <div class="ai-chat">
+          <div class="ai-name">
+            NaviAi
+          </div>
+          <div>
+            Greetings, Alex!👋 I'm Navi, your AI career guide - here to help you get real results, with step-by-step plans, helpful resources, and a routine designed just for you! <br> <br>
+            Respond 'Yes' if you'd like me to go on.
+          </div>
+        </div>
+      </div>
+  
+      <!-- User message block -->
+      <div class="chat-container user">
+        <div class="user-chat">
+          <div class="user-name"></div>
+          <div>
+            Yes!
+          </div>
+        </div>
+      </div>
+
+      <!-- AI message block -->
+      <div class="chat-container">
+        <div>
+          <img src="Images/Frame 3.png" alt="logo">
+        </div>
+        <div class="ai-chat">
+          <div class="ai-name">
+            NaviAI
+          </div>
+          <div>
+            Great! First, let's get clear on your main goal - the one thing you want to achieve right now. I'll use this to <b>build your plan and daily routine. </b> Whta's your top goal?
+          </div>
+        </div>
+      </div>
+
+      <!-- User message block -->
+      <div class="chat-container user">
+        <div class="user-chat">
+          <div class="user-name"></div>
+          <div>
+            My top goal is to master this skill in the shortest possible time.
+          </div>
+        </div>
+      </div>
+
+      <!-- AI message block -->
+      <div class="chat-container">
+        <div>
+          <img src="Images/Frame 3.png" alt="logo">
+        </div>
+        <div class="ai-chat">
+          <div class="ai-name">
+            NaviAI
+          </div>
+          <div>
+            Got it! Mastering a skill fast. To guide you properly, what exact skill would you lik eot master?
+          </div>
+        </div>
+      </div>
+
+      <!-- User message block -->
+      <div class="chat-container user">
+        <div class="user-chat">
+          <div class="user-name"></div>
+          <div>
+            Product Design
+          </div>
+        </div>
+      </div>
+
+      <!-- AI message block -->
+      <div class="chat-container">
+        <div>
+          <img src="Images/Frame 3.png" alt="logo">
+        </div>
+        <div class="ai-chat">
+          <div class="ai-name">
+            NaviAI
+          </div>
+          <div>
+           Perfect - Product Design <br>
+           Let's break it down: What's one small action you can take today to start learning it?
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- 👇 Wrap send-message in same width scope -->
+    <div class="input-wrapper">
+      <div class="send-message">
+        <div class="box">
+          <div>
+            <textarea placeholder="Message Navi" rows="1"></textarea>
+          </div>
+          <div>
+            <span class="split">|</span>
+            <button onclick="sendMessage()">↑</button>
+          </div>
+        </div>
+        <div class="disclaimer">
+          Navi can sometimes make mistakes, verify important information.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script href="script.js"></script>
+</body>
+</html>
