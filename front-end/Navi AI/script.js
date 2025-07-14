@@ -111,7 +111,7 @@ function loadChatHistory() {
 
 // Initial greeting
 function sendInitialGreeting() {
-  const greeting = `Greetings, ${firstname} 👋 I’m Navi—your AI career guide. `;
+  const greeting = `Greetings, ${firstname} 👋 I’m Navi—your AI career guide.`;
   appendToChat(`
     <div class="chat-container">
       <div class="ai-chat">
