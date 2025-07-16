@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>NaviAI - Career Roadmap</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    form label {
+      display: block;
+      margin-top: 1rem;
+      font-weight: bold;
+    }
+    form textarea,
+    form input {
+      width: 100%;
+      padding: 0.5rem;
+      margin-top: 0.5rem;
+      resize: vertical;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1>NaviAI Career Roadmap</h1>
+
+  <!-- 📝 Onboarding Form -->
+  <form id="onboardingForm">
+    <h2>📝 Career Roadmap Onboarding</h2>
+
+    <!-- Background -->
+    <label>What is your current profession or educational background?
+      <input type="text" name="background" />
+    </label>
+
+    <label>What skills do you already have related to your goal?
+      <input type="text" name="skills" />
+    </label>
+
+    <!-- Career Goal -->
+    <label>What is the one main career objective you want to achieve?
+      <input type="text" name="goal" id="goalInput" required />
+    </label>
+
+    <!-- Motivation -->
+    <label>Why is this goal important to you right now?
+      <textarea name="motivation"></textarea>
+    </label>
+
+    <label>What outcome would make you feel you’ve succeeded?
+      <textarea name="success" ></textarea>
+    </label>
+
+    <!-- Time Commitment -->
+    <label>How many hours per week can you dedicate?
+      <input type="text" name="hours_per_week" />
+    </label>
+
+    <label>Preferred time of day (morning/afternoon/evening)?
+      <input type="text" name="preferred_time" />
+    </label>
+
+    <!-- Deadline -->
+    <label>When do you want to achieve this goal?
+      <input type="text" name="deadline" />
+    </label>
+
+    <!-- Learning Style -->
+    <label>Preferred learning style (videos, projects, reading)?
+      <input type="text" name="learning_style" />
+    </label>
+
+    <label>Tools or platforms you want to use?
+      <input type="text" name="tools" />
+    </label>
+
+    <!-- Support -->
+    <label>Would you like regular check‑ins or reminders?
+      <input type="text" name="checkins" />
+    </label>
+
+    <label>Do you have a mentor, peer group or community?
+      <input type="text" name="support" />
+    </label>
+
+    <!-- Challenges -->
+    <label>What obstacles have held you back so far?
+      <textarea name="obstacles"></textarea>
+    </label>
+
+    <label>Any specific constraints (budget, time, accessibility)?
+      <textarea name="constraints"></textarea>
+    </label>
+
+    <button type="submit" id="loadBtn">Generate Roadmap</button>
+  </form>
+
+  <!-- Roadmap Output -->
+  <div id="roadmapOutput" style="margin-top: 2rem;"></div>
+</div>
+
+<script src="script.js"></script>
+
+</body>
+</html>
