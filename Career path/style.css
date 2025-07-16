@@ -1,0 +1,79 @@
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: #f5f7fa;
+    margin: 0;
+    padding: 0;
+  }
+
+  .container {
+    max-width: 900px;
+    margin: 2rem auto;
+    padding: 1rem;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  }
+
+  h1, h2 {
+    color: #1b455b;
+  }
+
+  .goal, .timeframe {
+    font-size: 1.2rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .month-block {
+    margin-top: 2rem;
+    border-top: 1px solid #ddd;
+    padding-top: 1rem;
+  }
+
+  .month-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #333;
+  }
+
+  .week-block {
+    margin-top: 1rem;
+    margin-left: 1rem;
+  }
+
+  .week-title {
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+    color: #555;
+  }
+
+  .task {
+    background-color: #f1f5f9;
+    margin: 0.5rem 0;
+    padding: 0.8rem;
+    border-radius: 6px;
+  }
+
+  .task-title {
+    font-weight: bold;
+  }
+
+  .task-detail {
+    font-size: 0.95rem;
+    margin-top: 0.2rem;
+    color: #444;
+  }
+
+  #loadBtn {
+    margin-top: 1rem;
+    padding: 10px 20px;
+    background-color: #1b455b;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+
+  #loadBtn:hover {
+    background-color: #16384a;
+  }
