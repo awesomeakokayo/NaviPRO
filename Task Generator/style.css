@@ -1,0 +1,22 @@
+.daily-task-container {
+    margin-top: 2rem;
+    padding: 1rem;
+    background: #f9f9f9;
+    border-radius: 1rem;
+  }
+  
+  .daily-task-container h2 {
+    margin-bottom: 1rem;
+  }
+  
+  #daily-tasks-list li {
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+  }
+  
+  #daily-tasks-list input[type="checkbox"] {
+    margin-right: 0.5rem;
+    transform: scale(1.2);
+  }
+  
