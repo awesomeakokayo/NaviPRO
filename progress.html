@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Overall Progress</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f5f5f5;
+      padding: 2rem;
+      display: flex;
+      justify-content: center;
+    }
+    .progress-card {
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      padding: 2rem;
+      max-width: 500px;
+      width: 100%;
+    }
+    .title {
+      font-size: 1rem;
+      color: #888;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+    .progress-section {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .milestone {
+      margin-left: 1.5rem;
+    }
+    .milestone-title {
+      font-weight: 600;
+    }
+    .milestone-sub {
+      color: #777;
+      font-size: 0.85rem;
+    }
+    .advance-button {
+      background: #f9f9f9;
+      border: 1px solid #ddd;
+      padding: 0.4rem 1rem;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      margin: 0.5rem 0;
+    }
+    .streak {
+      color: #ff5722;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+    .navi-box {
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 0.5rem;
+      margin-top: 1.5rem;
+      font-size: 0.9rem;
+      color: #333;
+    }
+    .navi-box span {
+      color: #f39c12;
+      font-weight: 600;
+    }
+    .summary {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 1.5rem;
+    }
+    .summary-box {
+      flex: 1;
+      padding: 1rem 0;
+      border-radius: 12px;
+      background: #f9f9f9;
+      margin: 0 0.5rem;
+    }
+    .summary-box:first-child {
+      margin-left: 0;
+    }
+    .summary-box:last-child {
+      margin-right: 0;
+    }
+    .summary-box h3 {
+      margin: 0;
+      font-size: 1.2rem;
+    }
+    .summary-box p {
+      margin: 0.3rem 0 0;
+      font-size: 0.85rem;
+      color: #555;
+    }
+  </style>
+</head>
+<body>
+  <div class="progress-card">
+    <div class="title">
+      <img src="https://img.icons8.com/ios-glyphs/30/888888/combo-chart.png" width="16" />
+      Your overall progress
+    </div>
+    <div class="progress-section">
+      <canvas id="progressChart" width="120" height="120"></canvas>
+      <div class="milestone">
+        <div class="milestone-title">Next Milestone</div>
+        <div class="milestone-sub">Design Systems</div>
+        <button class="advance-button">Advance →</button>
+        <div class="streak">🔥 5 - day streak</div>
+      </div>
+    </div>
+
+    <div class="navi-box">
+      <img src="https://img.icons8.com/external-flat-juicy-fish/60/000000/external-rocket-startup-flat-flat-juicy-fish.png" width="24" />
+      <span>Navi</span>: You’re right on track, don’t let up now!
+    </div>
+
+    <div class="summary">
+      <div class="summary-box" style="color: #2ecc71;">
+        <h3>8</h3>
+        <p>Completed</p>
+      </div>
+      <div class="summary-box" style="color: #264653;">
+        <h3>12</h3>
+        <p>In progress</p>
+      </div>
+      <div class="summary-box" style="color: #b0b0b0;">
+        <h3>20</h3>
+        <p>Upcoming</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const ctx = document.getElementById('progressChart').getContext('2d');
+    new Chart(ctx, {
+      type: 'doughnut',
+      data: {
+        datasets: [{
+          data: [8, 12, 20],
+          backgroundColor: ['#2ecc71', '#264653', '#b0b0b0'],
+          borderWidth: 0,
+          cutout: '75%'
+        }]
+      },
+      options: {
+        responsive: false,
+        plugins: {
+          tooltip: { enabled: false },
+          legend: { display: false },
+        }
+      },
+      plugins: [{
+        id: 'centerText',
+        beforeDraw(chart) {
+          const { width, height, ctx } = chart;
+          ctx.restore();
+          const fontSize = (height / 5).toFixed(2);
+          ctx.font = `${fontSize}px 'Segoe UI'`;
+          ctx.textBaseline = 'middle';
+          ctx.fillStyle = '#000';
+          const text = '49%';
+          const textX = Math.round((width - ctx.measureText(text).width) / 2);
+          const textY = height / 2;
+          ctx.fillText(text, textX, textY);
+          ctx.save();
+        }
+      }]
+    });
+  </script>
+</body>
+</html>

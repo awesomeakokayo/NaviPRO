@@ -55,6 +55,7 @@ body{
     padding-top: 12px;
     padding-bottom: 12px;
     padding-left: 2px;
+    font-size: 300;
 }
 .nav-button, button{
     cursor: pointer;
@@ -62,6 +63,7 @@ body{
     display: flex;
     align-items: center;
     text-decoration: none;
+    font-size: 1rem;
 }
 
 .bottom-navigation{
@@ -84,6 +86,7 @@ body{
     display: flex;
     flex-direction: column;
     width: 82%;
+    height: 100vh;
 }
 
 .icons{
@@ -103,6 +106,7 @@ body{
     background: rgb(190, 190, 190);
     padding: 4px;
     border-radius: 50%;
+    cursor: pointer;
 }
 .profile{
     border-radius: 50%;
@@ -113,4 +117,402 @@ body{
     background: #F4F4F4;
     height: 100%;
     padding: 1rem;
+    overflow-y: auto;
+    width: 100%;
+}
+
+.welcome{
+    color: white;
+    background: url(Images/Welcome!\ \(1\).png);
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: center;
+    padding: 1rem;
+    width: 1000px;
+    height: auto;
+    aspect-ratio: 2045 / 323; 
+    height: max-content;
+    display: inline-block;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.name{
+    font-size: 2.2rem;
+}
+
+.navi{
+    text-decoration: none;
+}
+.talk-to-navi{
+    border-radius: 0.5rem;
+    padding: 0.5rem;
+    color: #1A4156;
+    background: white;
+}
+
+.progress-section{
+    display: flex;
+    flex-direction: row;
+}
+
+/* Progress Tracker Style */
+.tracker-card {
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      padding: 1.5rem;
+      margin: 0.5rem;
+    }
+    .header {
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    canvas {
+      margin-top: 1rem;
+    }
+    .navi-box {
+      display: flex;
+      align-items: flex-start;
+      margin-top: 1.5rem;
+      border-top: 1px solid #e0e0e0;
+      padding-top: 1rem;
+    }
+    .navi-icon {
+      margin-right: 0.8rem;
+      width: 32px;
+      height: 32px;
+    }
+    .navi-text {
+      font-size: smaller;
+      color: #225570;
+    }
+    .navi-text span {
+      color: #FF9E00;
+      font-weight: 600;
+    }
+    .time{
+        float: right; 
+        font-size: 0.85rem; 
+        color: grey;
+    }
+    .label{
+        display: flex;
+        align-items: center;
+        color: grey;
+        font-weight: lighter;
+    }
+     .custom-legend {
+      display: flex;
+      justify-content: flex-end;
+      gap: 1rem;
+      margin-top: 1rem;
+      font-size: 0.85rem;
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+    .legend-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+
+.progress-section{
+    bottom: 1.5rem;
+    width: 100%;
+}
+.left-progress-section{
+    width: 60%;
+}
+
+.task{
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    padding: 1.5rem;
+    margin: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    color: #737373;
+}
+
+.task-header{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+}
+
+.task-list{
+    display: flex;
+    flex-direction: column;
+}
+
+.task-lists{
+    display: flex;
+    align-items: center;
+    font-size: smaller;
+    padding-bottom: 5px;
+}
+
+.done{
+    color: #737373;
+}
+
+.task-lists1{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.active-task{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.first-icon{
+    padding: 5px;
+    background: #225672;
+    border-radius: 50%;
+}
+.second-icon{
+    padding: 6px;
+    background: #38B000;
+    border-radius: 50%;
+}
+.third-icon{
+    padding: 5px;
+    background: #FF9E00;
+    border-radius: 50%;
+}
+
+.task-navi{
+    display: flex;
+    align-items: center;
+    font-size: smaller;
+    margin-top: 1rem;
+    border-top: 1px solid #737373;
+}
+
+.task-navi-ai{
+    color: #FF9E00;
+}
+
+.skill{
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    padding: 1.5rem;
+    margin: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    color: #737373;
+    font-size: smaller;
+}
+.skill-header{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+.skill-header-left{
+    font-size: 1.6rem;
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+p{
+    margin-bottom: 0.5rem;
+}
+.explore-task{
+    display: flex;
+    justify-content: space-between;
+    padding: 15px;
+    color: #225570;
+}
+.explore-{
+    text-decoration: none;
+    color: #225570;
+}
+.bottom{
+    display: flex;
+    align-items: center;
+}
+
+.right-progress-section{
+    width: 40%;
+    top: 0;
+}
+
+.progress-section{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    top: 0;
+}
+
+.progress-card{
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    padding: 1.5rem;
+    margin: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    color: #737373;
+}
+
+.advance-button{
+    color: #1A4156;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    margin: 1rem;
+    padding: 0.5rem;
+    border-radius: 6px;
+}
+.advance-button1{
+    text-decoration: none;
+}
+
+.title{
+    display: flex;
+    align-items: center;
+    margin-top: 1rem;
+    margin-bottom: 2rem;
+}
+.title1{    
+    font-size: 1rem;
+}
+
+.milestone{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.milestone-title{
+    display: flex;
+    color: black;
+    align-items: center;
+    cursor: pointer;
+    text-decoration: none;
+}
+.milestone-sub{
+    font-size: smaller;
+}
+.text{
+    font-size: smaller;
+}
+
+.navi-box{
+    margin-top: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+.summary{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    background: #E9EEF13D;
+    height: 150px;
+    border-radius: 18x;
+}
+.summary-box{
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+.summary-box1{
+    width: 100%;
+    height: 100%;
+    flex-direction: column;
+    border-left: 1px solid grey;
+    border-right: 1px solid grey;
+    justify-content: center;
+    display: flex;
+    align-items: center;
+}
+.last-icon{
+    padding: 5px;
+    background: #FF9E00;
+    border-radius: 50%;
+}
+.middle-icon{
+    padding: 5px;
+    background: #225570;
+    border-radius: 50%;
+}
+h3{
+    margin-top: 0.8rem;
+    margin-bottom: 0.8rem;
+    font-weight: 300;
+    color: black;
+}
+
+.video-recommendation{
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    padding: 1.5rem;
+    margin: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    color: #737373;
+}
+.video-recommendation-left{
+    display: flex;
+    align-items: center;
+}
+.video-recommendation-header{
+    display: flex;
+    justify-content: space-between;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+}
+.video-content{
+    display: flex;
+    flex-direction: row;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    padding: 0.3rem;
+    border-radius: 8px;
+    margin-bottom: 5px;
+}
+.video-detail{
+    font-size: x-small;
+    display: flex;
+    justify-content: space-between;
+}
+.video-title{
+    font-size: 10px;
+    color: black;
+    text-decoration: none;
+}
+.video-about{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 2px;
+}
+.ratings{
+    display: flex;
+    flex-direction: row;
+    margin-left: 10px;
+    align-items: center;
+}
+.video-cover{
+    object-fit: cover;
+}
+b{
+    margin-left: 3px;
 }

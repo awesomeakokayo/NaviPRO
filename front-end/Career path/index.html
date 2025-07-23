@@ -5,100 +5,79 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>NaviAI - Career Roadmap</title>
   <link rel="stylesheet" href="style.css">
-  <style>
-    form label {
-      display: block;
-      margin-top: 1rem;
-      font-weight: bold;
-    }
-    form textarea,
-    form input {
-      width: 100%;
-      padding: 0.5rem;
-      margin-top: 0.5rem;
-      resize: vertical;
-    }
-  </style>
+  
 </head>
 <body>
 
-<div class="container">
-  <h1>NaviAI Career Roadmap</h1>
+<form id="onboardingForm" style="max-width:600px; margin:2rem auto; font-family:Poppins, sans-serif;">
+  <!-- Step 1: Career Goal -->
+  <fieldset style="margin-bottom:1.5rem;">
+    <legend style="font-size:1.25rem; font-weight:600;">🟣 Step 1: Career Goal</legend>
+    <p style="margin-bottom:0.5rem;">What’s your main career goal right now?</p>
+    <label><input type="radio" name="goal" value="Land my first job" required> Land my first job</label><br>
+    <label><input type="radio" name="goal" value="Switch to a new field"> Switch to a new field</label><br>
+    <label><input type="radio" name="goal" value="Get a remote job"> Get a remote job</label><br>
+    <label><input type="radio" name="goal" value="Start freelancing"> Start freelancing</label><br>
+    <label><input type="radio" name="goal" value="Upskill in my current field"> Upskill in my current field</label>
+  </fieldset>
 
-  <!-- 📝 Onboarding Form -->
-  <form id="onboardingForm">
-    <h2>📝 Career Roadmap Onboarding</h2>
+  <!-- Step 2: Target Role -->
+  <fieldset style="margin-bottom:1.5rem;">
+    <legend style="font-size:1.25rem; font-weight:600;">🟣 Step 2: Target Role</legend>
+    <p style="margin-bottom:0.5rem;">What role or job title are you working toward?</p>
+    <small style="display:block; margin-bottom:0.5rem; color:#666;">Example: UI/UX Designer, Data Analyst, Project Manager…</small>
+    <input type="text" name="target_role" placeholder="e.g. UI/UX Designer" required style="width:100%; padding:0.5rem; border:1px solid #ccc; border-radius:4px;">
+  </fieldset>
 
-    <!-- Background -->
-    <label>What is your current profession or educational background?
-      <input type="text" name="background" />
-    </label>
+  <!-- Step 3: Why This Goal Matters -->
+  <fieldset style="margin-bottom:1.5rem;">
+    <legend style="font-size:1.25rem; font-weight:600;">🟣 Step 3: Why This Goal Matters</legend>
+    <p style="margin-bottom:0.5rem;">Why is this goal important to you right now?</p>
+    <textarea name="why" rows="3" required style="width:100%; padding:0.5rem; border:1px solid #ccc; border-radius:4px; resize:vertical;" placeholder="Tell us why this matters..."></textarea>
+  </fieldset>
 
-    <label>What skills do you already have related to your goal?
-      <input type="text" name="skills" />
-    </label>
+  <!-- Step 4: Timeline -->
+  <fieldset style="margin-bottom:1.5rem;">
+    <legend style="font-size:1.25rem; font-weight:600;">🟣 Step 4: Timeline</legend>
+    <p style="margin-bottom:0.5rem;">When would you like to achieve this goal?</p>
+    <label><input type="radio" name="timeframe" value="In 3 months" required> In 3 months</label><br>
+    <label><input type="radio" name="timeframe" value="In 6 months"> In 6 months</label><br>
+    <label><input type="radio" name="timeframe" value="In 1 year"> In 1 year</label><br>
+    <label><input type="radio" name="timeframe" value="I’m not sure"> I’m not sure</label>
+  </fieldset>
 
-    <!-- Career Goal -->
-    <label>What is the one main career objective you want to achieve?
-      <input type="text" name="goal" id="goalInput" required />
-    </label>
+  <!-- Step 5: Weekly Time Commitment -->
+  <fieldset style="margin-bottom:1.5rem;">
+    <legend style="font-size:1.25rem; font-weight:600;">🟣 Step 5: Weekly Time Commitment</legend>
+    <label><input type="radio" name="hours_per_week" value="1-3 hours" required> 1–3 hours</label><br>
+    <label><input type="radio" name="hours_per_week" value="4-6 hours"> 4–6 hours</label><br>
+    <label><input type="radio" name="hours_per_week" value="7-10 hours"> 7–10 hours</label><br>
+    <label><input type="radio" name="hours_per_week" value="10+ hours"> 10+ hours</label>
+  </fieldset>
 
-    <!-- Motivation -->
-    <label>Why is this goal important to you right now?
-      <textarea name="motivation"></textarea>
-    </label>
+  <fieldset style="margin-bottom:1.5rem;">
+    <legend style="font-size:1.25rem; font-weight:600;">🟣 Step 7: Learning Speed</legend>
+    <p style="margin-bottom:0.5rem;">How fast do you learn?</p>
+    <label><input type="radio" name="learning_speed" value="Slow pace" required> Slow pace</label><br>
+    <label><input type="radio" name="learning_speed" value="Average pace"> Average pace</label><br>
+    <label><input type="radio" name="learning_speed" value="Fast pace"> Fast pace</label><br>
+  </fieldset>
 
-    <label>What outcome would make you feel you’ve succeeded?
-      <textarea name="success" ></textarea>
-    </label>
+  <fieldset style="margin-bottom:1.5rem;">
+    <legend style="font-size:1.25rem; font-weight:600;">🟣 Step 7: Skill Level</legend>
+    <p style="margin-bottom:0.5rem;">What is your current skill level?</p>
+    <label><input type="radio" name="skill_level" value="Beginner" required> Beginner</label><br>
+    <label><input type="radio" name="skill_level" value="Intermediate"> Intermediate</label><br>
+    <label><input type="radio" name="skill_level" value="Advanced"> Advanced</label><br>
+  </fieldset>
+  
 
-    <!-- Time Commitment -->
-    <label>How many hours per week can you dedicate?
-      <input type="text" name="hours_per_week" />
-    </label>
+  <!-- Submit -->
+  <button id="loadBtn" type="submit" style="display:block; width:100%; padding:0.75rem; background:#264653; color:#fff; font-size:1rem; border:none; border-radius:4px;">Generate Roadmap</button>
+</form>
 
-    <label>Preferred time of day (morning/afternoon/evening)?
-      <input type="text" name="preferred_time" />
-    </label>
+<div id="roadmapOutput" style="margin-top:2rem; font-family:Poppins, sans-serif;"></div>
 
-    <!-- Deadline -->
-    <label>When do you want to achieve this goal?
-      <input type="text" name="deadline" />
-    </label>
-
-    <!-- Learning Style -->
-    <label>Preferred learning style (videos, projects, reading)?
-      <input type="text" name="learning_style" />
-    </label>
-
-    <label>Tools or platforms you want to use?
-      <input type="text" name="tools" />
-    </label>
-
-    <!-- Support -->
-    <label>Would you like regular check‑ins or reminders?
-      <input type="text" name="checkins" />
-    </label>
-
-    <label>Do you have a mentor, peer group or community?
-      <input type="text" name="support" />
-    </label>
-
-    <!-- Challenges -->
-    <label>What obstacles have held you back so far?
-      <textarea name="obstacles"></textarea>
-    </label>
-
-    <label>Any specific constraints (budget, time, accessibility)?
-      <textarea name="constraints"></textarea>
-    </label>
-
-    <button type="submit" id="loadBtn">Generate Roadmap</button>
-  </form>
-
-  <!-- Roadmap Output -->
-  <div id="roadmapOutput" style="margin-top: 2rem;"></div>
-</div>
 
 <script src="script.js"></script>
 

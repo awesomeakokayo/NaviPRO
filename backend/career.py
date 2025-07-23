@@ -1,14 +1,14 @@
-#  backend/career.py
-import openai, traceback, json
+# backend/career.py
+import httpx, traceback, json
 from dotenv import load_dotenv
 import os
 
 load_dotenv()
-openai.api_key  = os.getenv("GROQ_API_KEY")
-openai.api_base = os.getenv("GROQ_BASE_URL")  # correct property
+GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+GROQ_BASE_URL = os.getenv("GROQ_BASE_URL") or "https://api.groq.com/openai/v1"
 
 # DEBUG — confirm what the client thinks your base is:
-print("🔧 Using OpenAI API base:", openai.api_base)
+print("🔧 Using GROQ API base:", GROQ_BASE_URL)
 
 # Step 1: Generate raw roadmap JSON string via LLM
 SYSTEM_PROMPT = (
@@ -35,14 +35,20 @@ def generate_roadmap(inputs: dict) -> str:
         "Constraints: " + (inputs.get('constraints') or "N/A") + "\n"
     )
     try:
-        resp = openai.chat.completions.create(
-            model="llama3-70b-8192",
-            messages=[
+        headers = {
+            "Authorization": f"Bearer {GROQ_API_KEY}",
+            "Content-Type": "application/json"
+        }
+        data = {
+            "model": "llama3-70b-8192",
+            "messages": [
                 {"role": "system", "content": SYSTEM_PROMPT},
                 {"role": "user", "content": prompt}
             ]
-        )
-        return resp.choices[0].message.content.strip()
+        }
+        response = httpx.post(f"{GROQ_BASE_URL}/chat/completions", headers=headers, json=data)
+        response.raise_for_status()
+        return response.json()["choices"][0]["message"]["content"].strip()
     except Exception:
         traceback.print_exc()
         return "{\"roadmap\": {}}"
@@ -86,14 +92,20 @@ def get_structured_roadmap(inputs: dict) -> dict:
 
 def chat_with_navi(message: str) -> str:
     try:
-        response = openai.chat.completions.create(
-            model="llama3-70b-8192",
-            messages=[
+        headers = {
+            "Authorization": f"Bearer {GROQ_API_KEY}",
+            "Content-Type": "application/json"
+        }
+        data = {
+            "model": "llama3-70b-8192",
+            "messages": [
                 {"role": "system", "content": "You're Navi, an AI career guide."},
                 {"role": "user", "content": message}
             ]
-        )
-        return response.choices[0].message.content.strip()
+        }
+        response = httpx.post(f"{GROQ_BASE_URL}/chat/completions", headers=headers, json=data)
+        response.raise_for_status()
+        return response.json()["choices"][0]["message"]["content"].strip()
     except Exception as e:
         print("Chat error:", e)
         return "Sorry, something went wrong."
