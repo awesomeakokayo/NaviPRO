@@ -1,5 +1,3 @@
-# backend/agent_orchestra.py
-
 import os
 import json
 from uuid import uuid4
@@ -11,10 +9,10 @@ import httpx
 
 load_dotenv()
 
-# ─── Configuration ──────────────────────────────────────────────────────────────
+# ─── Configuration 
 GROQ_API_KEY  = os.getenv("GROQ_API_KEY")
 # Remove the trailing path from base URL
-GROQ_BASE_URL = os.getenv("GROQ_BASE_URL", "https://api.groq.com/openai/v1")
+GROQ_BASE_URL = os.getenv("GROQ_BASE_URL")
 YOUTUBE_API_KEY = os.getenv("YOUTUBE_API_KEY")
 
 # In-memory user store (for demo)
@@ -28,7 +26,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# ─── Models ─────────────────────────────────────────────────────────────────────
+# ─── Data Models
 from typing import Optional
 
 class FullPipelineReq(BaseModel):
@@ -53,7 +51,7 @@ def regroup_by_year(flat_months: list[dict], months_per_year: int = 12) -> list[
         })
     return years
 
-# ─── Helper: regroup flat weeks into months ─────────────────────────────────────
+# ─── Helper: regroup flat weeks into months
 def regroup_by_month(flat_weeks: list[dict], weeks_per_month: int = 4) -> list[dict]:
     months = []
     for i in range(0, len(flat_weeks), weeks_per_month):
@@ -65,7 +63,7 @@ def regroup_by_month(flat_weeks: list[dict], weeks_per_month: int = 4) -> list[d
         })
     return months
 
-# ─── 1) LLM-based Roadmap Generation via GROQ ─────────────────────────────────
+# ─── 1) LLM-based Roadmap Generation
 def llm_generate_roadmap(req: FullPipelineReq) -> dict:
     print(f"🔄 Starting roadmap generation for goal: {req.goal}")
     
@@ -73,18 +71,20 @@ def llm_generate_roadmap(req: FullPipelineReq) -> dict:
         print("❌ GROQ_API_KEY not found in environment variables")
         raise HTTPException(500, "GROQ_API_KEY not configured")
     
-    # Separate system prompt and user prompt
     system_prompt = """You are Navi, a realistic and practical career strategist AI.
 
-Your job is to design a personalized full stack development roadmap that fits the user's situation. You must be detailed, realistic, and output in valid JSON.
+Your job is to design a personalized roadmap that fits the user's situation. You must be detailed, realistic, and output in valid JSON.
 
 Instructions:
 1. Think step-by-step like a mentor coaching a student from scratch.
-2. Break the roadmap into clear weekly or bi-weekly stages based on their learning speed.
-3. Match tasks and concepts with the user's skill level.
-4. Ensure everything can fit within the timeframe realistically.
-5. Use only **free resources** (e.g., FreeCodeCamp, Scrimba, MDN, Youtube).
-6. Output only valid JSON in the format below.
+2. Break the roadmap into clear weekly stages based on their learning speed and timeframe.
+3. Each week should have 4-5 specific, actionable tasks.
+4. Match tasks and concepts with the user's skill level.
+5. Ensure everything can fit within the timeframe realistically.
+6. Use only **free resources** (e.g., FreeCodeCamp, Scrimba, MDN, Youtube).
+7. Output only valid JSON in the format below.
+8. Each week MUST have a specific "focus" that describes the main learning topic for that week.
+9. Weekly focus should be concise and searchable (e.g., "JavaScript DOM Manipulation", "React Hooks", "CSS Flexbox and Grid").
 
 JSON format:
 {
@@ -96,40 +96,77 @@ JSON format:
     "roadmap": [
         {
             "month": 1,
-            "focus": "Main focus of this stage",
+            "focus": "HTML, CSS & JavaScript Fundamentals",
             "weeks": [
                 {
-                "week": 1,
-                "tasks": [
-                    { "title": "Learn HTML basics", "estimated_time": "2 hours" },
-                    { "title": "Build first webpage", "estimated_time": "3 hours" }
-                ]
+                    "week": 1,
+                    "focus": "HTML Fundamentals and Semantic Structure",
+                    "tasks": [
+                        { "title": "Learn HTML basics", "description": "Complete FreeCodeCamp HTML section", "estimated_time": "8 hours" },
+                        { "title": "Build first webpage", "description": "Create a personal portfolio landing page", "estimated_time": "6 hours" },
+                        { "title": "HTML5 semantic elements", "description": "Learn article, section, nav, header, footer", "estimated_time": "4 hours" }
+                    ]
+                },
+                {
+                    "week": 2,
+                    "focus": "CSS Styling and Layout Techniques",
+                    "tasks": [
+                        { "title": "CSS fundamentals", "description": "Learn selectors, box model, positioning", "estimated_time": "8 hours" },
+                        { "title": "Flexbox mastery", "description": "Complete flexbox tutorial and build layouts", "estimated_time": "6 hours" },
+                        { "title": "CSS Grid basics", "description": "Learn grid layout for complex designs", "estimated_time": "6 hours" }
+                    ]
+                },
+                {
+                    "week": 3,
+                    "focus": "JavaScript Variables and Functions",
+                    "tasks": [
+                        { "title": "JavaScript basics", "description": "Variables, data types, operators", "estimated_time": "8 hours" },
+                        { "title": "Functions and scope", "description": "Function declarations, expressions, arrow functions", "estimated_time": "6 hours" },
+                        { "title": "JavaScript exercises", "description": "Practice problems on variables and functions", "estimated_time": "6 hours" }
+                    ]
+                },
+                {
+                    "week": 4,
+                    "focus": "JavaScript Control Flow and Loops",
+                    "tasks": [
+                        { "title": "Conditionals", "description": "if/else, switch statements, ternary operator", "estimated_time": "6 hours" },
+                        { "title": "Loops mastery", "description": "for, while, forEach, map, filter", "estimated_time": "8 hours" },
+                        { "title": "Build calculator app", "description": "Apply control flow in a practical project", "estimated_time": "6 hours" }
+                    ]
                 }
             ]
         }
     ]
 }"""
 
-    user_prompt = f"""Please create a roadmap for me with the following details:
+    user_prompt = f"""Create a detailed {req.timeframe} roadmap for:
 
-- Goal: {req.goal}
-- Target Role: {req.target_role}
-- Why: {req.why}
-- Timeframe: {req.timeframe}
-- Hours per week: {req.hours_per_week}
-- Current Skills: {', '.join(req.skills)}
-- Learning Style: {req.learning_style}
-- Learning Speed: {req.learning_speed} (slow, average, fast)
-- Skill Level: {req.skill_level} (beginner, intermediate, advanced)
+Goal: {req.goal}
+Target Role: {req.target_role}  
+Why: {req.why}
+Available Time: {req.hours_per_week} hours per week
+Current Skills: {', '.join(req.skills) if req.skills else 'None'}
+Learning Style: {req.learning_style}
+Learning Speed: {req.learning_speed}
+Skill Level: {req.skill_level}
 
-Please generate a detailed roadmap that fits my situation and return it as valid JSON only."""
+Requirements:
+- Create a month-by-month breakdown
+- Each month should have 4 weeks
+- Each week should have 3-5 specific tasks
+- Tasks should build upon each other logically
+- Include estimated time for each task
+- Focus on practical, hands-on learning
+- Only suggest free resources
+
+Return ONLY the JSON object with no additional formatting or text."""
 
     headers = {
         "Authorization": f"Bearer {GROQ_API_KEY}",
         "Content-Type": "application/json"
     }
     body = {
-        "model": "llama-3.1-8b-instant",  # Use a more reliable model
+        "model": "deepseek-r1-distill-llama-70b", 
         "messages": [
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": user_prompt}
@@ -139,13 +176,12 @@ Please generate a detailed roadmap that fits my situation and return it as valid
     }
 
     try:
-        # Fix the URL construction - remove the double slash
         api_url = f"{GROQ_BASE_URL}/chat/completions"
         print(f"🌐 Making request to Groq API: {api_url}")
         print(f"📝 Using model: {body['model']}")
         
-        # Create client with specific timeout and retry logic
-        with httpx.Client(timeout=60.0) as client:
+        
+        with httpx.Client(timeout=90.0) as client:
             resp = client.post(
                 api_url,
                 headers=headers,
@@ -156,87 +192,100 @@ Please generate a detailed roadmap that fits my situation and return it as valid
         
         resp.raise_for_status()
         response_data = resp.json()
-        print(f"✅ Got response from Groq API")
         
         raw = response_data["choices"][0]["message"]["content"]
         print(f"📄 Raw response length: {len(raw)} characters")
-        print(f"📄 First 200 chars: {raw[:200]}...")
         
         # Clean the response to extract JSON
         raw = raw.strip()
         if raw.startswith("```json"):
             raw = raw[7:]
+        elif raw.startswith("```"):
+            raw = raw[3:]
         if raw.endswith("```"):
             raw = raw[:-3]
         raw = raw.strip()
         
-        print(f"🧹 Cleaned response length: {len(raw)} characters")
+        # Try to extract JSON if it's wrapped in other text
+        json_start = raw.find('{')
+        json_end = raw.rfind('}') + 1
+        
+        if json_start != -1 and json_end > json_start:
+            raw = raw[json_start:json_end]
+        
+        print(f"🧹 Cleaned response: {raw[:500]}...")
         
         try:
             data = json.loads(raw)
             print("✅ Successfully parsed JSON response")
+            
+            # Validate structure
+            if "roadmap" not in data:
+                print("⚠️ No roadmap key found, creating structure")
+                data["roadmap"] = []
+            
+            # Ensure each task has required fields
+            for month in data.get("roadmap", []):
+                if "weeks" in month:
+                    for week in month["weeks"]:
+                        for task in week.get("tasks", []):
+                            if "description" not in task:
+                                task["description"] = f"Work on {task.get('title', 'this task')}"
+                            if "estimated_time" not in task:
+                                task["estimated_time"] = "5 hours"
+            
+            print(f"✅ Roadmap generated with {len(data.get('roadmap', []))} months")
+            return data
+            
         except json.JSONDecodeError as e:
             print(f"❌ Failed to parse JSON: {e}")
-            print(f"Raw response: {raw}")
-            # Return a fallback structure
+            print(f"Raw content: {raw}")
+            
+            # Enhanced fallback with more detailed structure
+            months_count = 3 if "3 month" in req.timeframe.lower() else 1
+            fallback_roadmap = []
+            
+            for month_num in range(1, months_count + 1):
+                month_data = {
+                    "month": month_num,
+                    "focus": f"Learning Phase {month_num}",
+                    "weeks": []
+                }
+                
+                for week_num in range(1, 5):  # 4 weeks per month
+                    week_data = {
+                        "week": week_num,
+                        "tasks": [
+                            {
+                                "title": f"Study fundamentals - Week {week_num}",
+                                "description": f"Focus on core concepts for month {month_num}",
+                                "estimated_time": "8 hours"
+                            },
+                            {
+                                "title": f"Practice projects - Week {week_num}",
+                                "description": f"Build hands-on projects for month {month_num}",
+                                "estimated_time": "6 hours"
+                            }
+                        ]
+                    }
+                    month_data["weeks"].append(week_data)
+                
+                fallback_roadmap.append(month_data)
+            
             return {
-                "goal": req.goal, 
-                "target_role": req.target_role, 
-                "why": req.why, 
+                "goal": req.goal,
+                "target_role": req.target_role,
+                "why": req.why,
                 "timeframe": req.timeframe,
                 "learning_speed": req.learning_speed,
                 "skill_level": req.skill_level,
-                "roadmap": [{
-                    "stage": "Getting Started",
-                    "duration_weeks": 4,
-                    "focus": "Foundation",
-                    "milestone": "Basic understanding",
-                    "tasks": [{
-                        "title": "Start learning basics",
-                        "description": "Begin with fundamentals",
-                        "estimated_time": "10 hours"
-                    }]
-                }]
+                "roadmap": fallback_roadmap
             }
 
-        # Ensure roadmap has the correct structure with tasks
-        if "roadmap" in data:
-            print(f"🗺️ Processing roadmap with {len(data['roadmap'])} stages")
-            for stage in data["roadmap"]:
-                if "tasks" not in stage:
-                    stage["tasks"] = [{
-                        "title": f"Learn {stage.get('focus', 'concepts')}",
-                        "description": stage.get('milestone', 'Complete stage milestone'),
-                        "estimated_time": "8 hours"
-                    }]
-
-        # If it's already nested with months/weeks, skip regroup
-        if all("weeks" in m for m in data.get("roadmap", [])):
-            print("🔄 Roadmap already has month/week structure")
-            return data
-
-        # Otherwise, regroup flat weeks
-        flat_roadmap = data.get("roadmap", [])
-        print(f"🔄 Regrouping {len(flat_roadmap)} stages into months")
-        data["roadmap"] = regroup_by_month(flat_roadmap)
-        print(f"✅ Roadmap generation completed successfully")
-        return data
-        
     except httpx.HTTPStatusError as e:
         print(f"❌ HTTP Error: {e.response.status_code}")
         print(f"❌ Response body: {e.response.text}")
         raise HTTPException(500, f"API Error: {e.response.status_code} - {e.response.text}")
-    except httpx.ConnectError as e:
-        print(f"❌ Connection Error: {e}")
-        print("💡 Troubleshooting tips:")
-        print("   - Check your internet connection")
-        print("   - Verify GROQ_API_KEY is valid")
-        print("   - Try pinging api.groq.com")
-        print("   - Check if you're behind a firewall/proxy")
-        raise HTTPException(500, "Failed to connect to Groq API - check internet connection and API key")
-    except httpx.TimeoutException as e:
-        print(f"❌ Timeout Error: {e}")
-        raise HTTPException(500, "Request to Groq API timed out")
     except Exception as e:
         print(f"❌ Unexpected error in llm_generate_roadmap: {e}")
         import traceback
@@ -245,6 +294,7 @@ Please generate a detailed roadmap that fits my situation and return it as valid
 
 # ─── 2) YouTube Search Helper ─────────────────────────────────────────────────
 def youtube_search(query: str, max_results: int = 5) -> list[dict]:
+
     if not YOUTUBE_API_KEY:
         print("⚠️ No YouTube API key configured, skipping video search")
         return []
@@ -259,7 +309,10 @@ def youtube_search(query: str, max_results: int = 5) -> list[dict]:
                 "part": "snippet",
                 "q": query,
                 "type": "video",
-                "maxResults": max_results
+                "maxResults": max_results,
+                "q": query + " tutorial",
+                "videoDuration": "long",  # > 20 min videos
+                "relevanceLanguage": "en"
             }).json()
             
             ids = [item["id"]["videoId"] for item in sr.get("items", [])]
@@ -271,6 +324,7 @@ def youtube_search(query: str, max_results: int = 5) -> list[dict]:
                 "part": "snippet,contentDetails,statistics",
                 "id": ",".join(ids)
             }).json()
+            
 
         out = []
         for item in dr.get("items", []):
