@@ -1,6 +1,7 @@
 import os
 import json
 from uuid import uuid4
+from datetime import datetime, timedelta
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
@@ -9,14 +10,14 @@ import httpx
 
 load_dotenv()
 
-# ─── Configuration 
+
 GROQ_API_KEY  = os.getenv("GROQ_API_KEY")
-# Remove the trailing path from base URL
 GROQ_BASE_URL = os.getenv("GROQ_BASE_URL")
 YOUTUBE_API_KEY = os.getenv("YOUTUBE_API_KEY")
 
 # In-memory user store (for demo)
 user_store: dict[str, dict] = {}
+chat_history: dict[str, list] = {}
 
 app = FastAPI()
 app.add_middleware(
@@ -26,8 +27,14 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# ─── Data Models
-from typing import Optional
+from typing import Optional, List
+
+class ChatMessage(BaseModel):
+    message: str
+    user_id: str
+
+class TaskCompletion(BaseModel):
+    task_completed: bool = True
 
 class FullPipelineReq(BaseModel):
     goal: str
@@ -51,7 +58,7 @@ def regroup_by_year(flat_months: list[dict], months_per_year: int = 12) -> list[
         })
     return years
 
-# ─── Helper: regroup flat weeks into months
+# regroup flat weeks into months
 def regroup_by_month(flat_weeks: list[dict], weeks_per_month: int = 4) -> list[dict]:
     months = []
     for i in range(0, len(flat_weeks), weeks_per_month):
@@ -63,28 +70,34 @@ def regroup_by_month(flat_weeks: list[dict], weeks_per_month: int = 4) -> list[d
         })
     return months
 
-# ─── 1) LLM-based Roadmap Generation
+#LLM-based Roadmap Generation
 def llm_generate_roadmap(req: FullPipelineReq) -> dict:
-    print(f"🔄 Starting roadmap generation for goal: {req.goal}")
+    """Generate comprehensive roadmap with weekly focuses and daiaaly taks"""
+    print(f" Generating roadmap for: {req.goal}")
     
     if not GROQ_API_KEY:
-        print("❌ GROQ_API_KEY not found in environment variables")
         raise HTTPException(500, "GROQ_API_KEY not configured")
     
-    system_prompt = """You are Navi, a realistic and practical career strategist AI.
+    system_prompt = """You are Navi, a very realistic and practical expert career strategist AI that creates detailed learning roadmaps.
 
 Your job is to design a personalized roadmap that fits the user's situation. You must be detailed, realistic, and output in valid JSON.
 
-Instructions:
+Create a structured roadmap that breaks down into:
+- Monthly phases with clear focus areas
+- Weekly focuses with specific learning topics
+- Daily task that can be completed in the specified time
+
+Requirements:
 1. Think step-by-step like a mentor coaching a student from scratch.
 2. Break the roadmap into clear weekly stages based on their learning speed and timeframe.
-3. Each week should have 4-5 specific, actionable tasks.
-4. Match tasks and concepts with the user's skill level.
-5. Ensure everything can fit within the timeframe realistically.
-6. Use only **free resources** (e.g., FreeCodeCamp, Scrimba, MDN, Youtube).
-7. Output only valid JSON in the format below.
-8. Each week MUST have a specific "focus" that describes the main learning topic for that week.
-9. Weekly focus should be concise and searchable (e.g., "JavaScript DOM Manipulation", "React Hooks", "CSS Flexbox and Grid").
+3. Each week must have a specific "focus" (e.g., "JavaScript DOM Manipulation", "React Hooks", "CSS Flexbox and Grid").
+4. Each task chould be achievable in 1-3 hours
+5. Each week should have 5-7 daily tasks.
+6. Match tasks and concepts with the user's skill level.
+7. Ensure everything can fit within the timeframe realistically.
+8. Use only **free resources** (e.g., FreeCodeCamp, Scrimba, MDN, Youtube).
+9. Output only valid JSON in the format below.
+
 
 JSON format:
 {
@@ -96,42 +109,19 @@ JSON format:
     "roadmap": [
         {
             "month": 1,
-            "focus": "HTML, CSS & JavaScript Fundamentals",
+            "focus": "Foundation Building",
             "weeks": [
                 {
                     "week": 1,
                     "focus": "HTML Fundamentals and Semantic Structure",
-                    "tasks": [
-                        { "title": "Learn HTML basics", "description": "Complete FreeCodeCamp HTML section", "estimated_time": "8 hours" },
-                        { "title": "Build first webpage", "description": "Create a personal portfolio landing page", "estimated_time": "6 hours" },
-                        { "title": "HTML5 semantic elements", "description": "Learn article, section, nav, header, footer", "estimated_time": "4 hours" }
-                    ]
-                },
-                {
-                    "week": 2,
-                    "focus": "CSS Styling and Layout Techniques",
-                    "tasks": [
-                        { "title": "CSS fundamentals", "description": "Learn selectors, box model, positioning", "estimated_time": "8 hours" },
-                        { "title": "Flexbox mastery", "description": "Complete flexbox tutorial and build layouts", "estimated_time": "6 hours" },
-                        { "title": "CSS Grid basics", "description": "Learn grid layout for complex designs", "estimated_time": "6 hours" }
-                    ]
-                },
-                {
-                    "week": 3,
-                    "focus": "JavaScript Variables and Functions",
-                    "tasks": [
-                        { "title": "JavaScript basics", "description": "Variables, data types, operators", "estimated_time": "8 hours" },
-                        { "title": "Functions and scope", "description": "Function declarations, expressions, arrow functions", "estimated_time": "6 hours" },
-                        { "title": "JavaScript exercises", "description": "Practice problems on variables and functions", "estimated_time": "6 hours" }
-                    ]
-                },
-                {
-                    "week": 4,
-                    "focus": "JavaScript Control Flow and Loops",
-                    "tasks": [
-                        { "title": "Conditionals", "description": "if/else, switch statements, ternary operator", "estimated_time": "6 hours" },
-                        { "title": "Loops mastery", "description": "for, while, forEach, map, filter", "estimated_time": "8 hours" },
-                        { "title": "Build calculator app", "description": "Apply control flow in a practical project", "estimated_time": "6 hours" }
+                    "daily_tasks": [
+                        { "day": 1,
+                        "title": "Learn HTML Basics", 
+                        "description": "Study HTML elements, tags, and document structure", 
+                        "goal": "Undestand how HTML creates web page structure",
+                        "estimated_time": "2 hours",
+                        "resources": ["MDN HTML Basics", "FreeCodeCamp HTML section"] 
+                        }
                     ]
                 }
             ]
@@ -139,7 +129,7 @@ JSON format:
     ]
 }"""
 
-    user_prompt = f"""Create a detailed {req.timeframe} roadmap for:
+    user_prompt = f"""Create a {req.timeframe} roadmap for:
 
 Goal: {req.goal}
 Target Role: {req.target_role}  
@@ -150,331 +140,550 @@ Learning Style: {req.learning_style}
 Learning Speed: {req.learning_speed}
 Skill Level: {req.skill_level}
 
-Requirements:
-- Create a month-by-month breakdown
-- Each month should have 4 weeks
-- Each week should have 3-5 specific tasks
-- Tasks should build upon each other logically
-- Include estimated time for each task
-- Focus on practical, hands-on learning
-- Only suggest free resources
-
-Return ONLY the JSON object with no additional formatting or text."""
-
-    headers = {
-        "Authorization": f"Bearer {GROQ_API_KEY}",
-        "Content-Type": "application/json"
-    }
-    body = {
-        "model": "deepseek-r1-distill-llama-70b", 
-        "messages": [
-            {"role": "system", "content": system_prompt},
-            {"role": "user", "content": user_prompt}
-        ],
-        "temperature": 0.4,
-        "max_tokens": 4000
-    }
+Create detailed daily tasks that progressively build skills."""
 
     try:
-        api_url = f"{GROQ_BASE_URL}/chat/completions"
-        print(f"🌐 Making request to Groq API: {api_url}")
-        print(f"📝 Using model: {body['model']}")
-        
-        
-        with httpx.Client(timeout=90.0) as client:
-            resp = client.post(
-                api_url,
-                headers=headers,
-                json=body
-            )
-        
-        print(f"📊 Response status: {resp.status_code}")
-        
-        resp.raise_for_status()
-        response_data = resp.json()
-        
-        raw = response_data["choices"][0]["message"]["content"]
-        print(f"📄 Raw response length: {len(raw)} characters")
+        with httpx.Client(timeout=120.0) as client:
+            response = client.post(
+                f"{GROQ_BASE_URL}/chat/completions",
+                headers={
+                    "Authorization": f"Bearer {GROQ_API_KEY}",
+                    "Content-Type": "application/json"
+                },
+                json={
+            "model": "deepseek-r1-distill-llama-70b", 
+            "messages": [
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_prompt}
+            ],
+            "temperature": 0.3,
+            "max_tokens": 4000
+        }
+    )
         
         # Clean the response to extract JSON
-        raw = raw.strip()
-        if raw.startswith("```json"):
-            raw = raw[7:]
-        elif raw.startswith("```"):
-            raw = raw[3:]
-        if raw.endswith("```"):
-            raw = raw[:-3]
-        raw = raw.strip()
+        raw_content = raw_content.strip()
+        if raw_content.startswith("```json"):
+            raw_content = raw_content[7:]
+        if raw_content.endswith("```"):
+            raw_content = raw_content[:-3]
+        raw_content = raw_content.strip()
         
-        # Try to extract JSON if it's wrapped in other text
-        json_start = raw.find('{')
-        json_end = raw.rfind('}') + 1
+        # Extract JSON
+        json_start = raw_content.find('{')
+        json_end = raw_content.rfind('}') + 1
         
         if json_start != -1 and json_end > json_start:
-            raw = raw[json_start:json_end]
+            raw_content = raw_content[json_start:json_end]
         
-        print(f"🧹 Cleaned response: {raw[:500]}...")
-        
-        try:
-            data = json.loads(raw)
-            print("✅ Successfully parsed JSON response")
-            
-            # Validate structure
-            if "roadmap" not in data:
-                print("⚠️ No roadmap key found, creating structure")
-                data["roadmap"] = []
-            
-            # Ensure each task has required fields
-            for month in data.get("roadmap", []):
-                if "weeks" in month:
-                    for week in month["weeks"]:
-                        for task in week.get("tasks", []):
-                            if "description" not in task:
-                                task["description"] = f"Work on {task.get('title', 'this task')}"
-                            if "estimated_time" not in task:
-                                task["estimated_time"] = "5 hours"
-            
-            print(f"✅ Roadmap generated with {len(data.get('roadmap', []))} months")
-            return data
-            
-        except json.JSONDecodeError as e:
-            print(f"❌ Failed to parse JSON: {e}")
-            print(f"Raw content: {raw}")
-            
-            # Enhanced fallback with more detailed structure
-            months_count = 3 if "3 month" in req.timeframe.lower() else 1
-            fallback_roadmap = []
-            
-            for month_num in range(1, months_count + 1):
-                month_data = {
-                    "month": month_num,
-                    "focus": f"Learning Phase {month_num}",
-                    "weeks": []
-                }
-                
-                for week_num in range(1, 5):  # 4 weeks per month
-                    week_data = {
-                        "week": week_num,
-                        "tasks": [
-                            {
-                                "title": f"Study fundamentals - Week {week_num}",
-                                "description": f"Focus on core concepts for month {month_num}",
-                                "estimated_time": "8 hours"
-                            },
-                            {
-                                "title": f"Practice projects - Week {week_num}",
-                                "description": f"Build hands-on projects for month {month_num}",
-                                "estimated_time": "6 hours"
-                            }
-                        ]
-                    }
-                    month_data["weeks"].append(week_data)
-                
-                fallback_roadmap.append(month_data)
-            
-            return {
-                "goal": req.goal,
-                "target_role": req.target_role,
-                "why": req.why,
-                "timeframe": req.timeframe,
-                "learning_speed": req.learning_speed,
-                "skill_level": req.skill_level,
-                "roadmap": fallback_roadmap
-            }
+        roadmap_data = json.loads(raw_content)
 
-    except httpx.HTTPStatusError as e:
-        print(f"❌ HTTP Error: {e.response.status_code}")
-        print(f"❌ Response body: {e.response.text}")
-        raise HTTPException(500, f"API Error: {e.response.status_code} - {e.response.text}")
+        # Add metadata and IDs
+        roadmap_data = enhance_roadmap_structure(roadmap_data)
+        
+        print("Roadmap generated successfully")
+        return roadmap_data
+            
     except Exception as e:
-        print(f"❌ Unexpected error in llm_generate_roadmap: {e}")
-        import traceback
-        traceback.print_exc()
-        raise HTTPException(500, f"Internal error during roadmap generation: {str(e)}")
+            print(f"Error generating roadmap: {e}")
+            return create_fallback_roadmap(req)
 
-# ─── 2) YouTube Search Helper ─────────────────────────────────────────────────
-def youtube_search(query: str, max_results: int = 5) -> list[dict]:
+def enhance_roadmap_structure(roadmap_data: dict) -> dict:
+    """Add IDs, completion status, and metadata to roadmap"""
+
+    #Start progress tracking
+    roadmap_data["progress"] = {
+        "current_day": 1,
+        "current_week": 1,
+        "current_month": 1,
+        "total_tasks_completed": 0,
+        "start_date": datetime.now().isoformat()
+    }
+
+    #Add IDs and completion status
+    for month in roadmap_data.get("roadmap", []):
+        month_num = month["month"]
+
+        for week in month.get("weeks", []):
+            week_num = week["week"]
+            week["week_id"] = f"month_{month_num}_week_{week_num}"
+            week["completed"] = False
+
+            for task in week.get("daily_tasks", []):
+                day_num = task["day"]
+                task["task_id"] = f"m{month_num}_w{week_num}_d{day_num}"
+                task["completed"] = False
+                task["completed_date"] = None
+
+                # Add motivational elements if missing
+                if "goal" not in task:
+                    task["goal"] = f"Master the fundamentals of {week['focus']}"
+                if "estimated_time" not in task:
+                    task["estimated_time"] = "2 hours"
+    return roadmap_data
+
+def create_fallback_roadmap(req: FullPipelineReq) -> dict:
+    print("Try again: roadmap could not be generated")
+
+# DAILY TASK SYSTEM
+def get_current_daily_task(user_id: str) -> dict:
+    """Get the current daily task for the user with motivation"""
+
+    roadmap = user_store.get(user_id)
+    if not roadmap:
+        return{}
+    
+    progress = roadmap.get("progress", {})
+    current_month = progress.get("current_month", 1)
+    current_week = progress.get("current_week", 1)
+    current_day = progress.get("current_day", 1)
+
+    # find current task
+    for month in roadmap.get("roadmap", []):
+        if month["month"] == current_month:
+            for week in month["weeks"]:
+                if week["week"] == current_week:
+                    for task in week.get("daily_tasks", []):
+                        if task["day"] == current_day and not task.get("completed", False):
+
+                            #Generate motivational message
+                            motivation = generate_motivational_message(
+                                roadmap["goal"],
+                                task["title"],
+                                progress.get("total_tasks_completed",0)
+                            )
+
+                            return {
+                                "task_id": task["task_id"],
+                                "title": task["title"],
+                                "description": task["description"],
+                                "goal": task["goal"],
+                                "estimated_time": task["estimated_time"],
+                                "resources": task.get("resources", []),
+                                "week_focus": week["focus"],
+                                "motivation_message": motivation,
+                                "progress": {
+                                    "current_day": current_day,
+                                    "current_week": current_week,
+                                    "current_month": current_month,
+                                    "total_completed": progress.get("total_tasks_completed", 0)
+                                }
+                            }
+    return {"message": "All tasks completed! 🎉"}
+
+def generate_motivational_message(goal: str, task_title: str, completed_task: int) -> str:
+    """Generate AI-powered motivational message"""
+
+    messages = [
+        f"🚀 Great job! You're {completed_task} steps closer to '{goal}. Every expert was once a beginner!'",
+        f"💪 You're building somthing amazing! This '{task_title}' task is a crucial building block for '{goal}'.",
+        f" 🌟 Remember why you started: '{goal}'. Today's task brings you closer to that dream!"
+        f"🔥 Consistency beats perfection! You've completed {completed_task} tasks already. Keep the momentum going!",
+        f" 💡Every practice, every concept learned, every task completed is an investment in your future self!",
+        f"🎯 Focus on progress, not perfection. '{task_title}' might seem small, but it's a vital step forward '{goal}'!",
+        f"⭐ You're not just learning to code, you're building a new future. '{goal}' is within reach!",
+        f"🚗 Think of learning like driving - you don't need to see the whole road, just a few steps. Today's task: '{task_title}' "
+
+    ]
+
+    import random
+    return random.choice(messages)
+
+def mark_task_completed(user_id: str, task_id: str) -> dict:
+    """Mark current task as completed and move to next"""
+
+    roadmap = user_store.get(user_id)
+    if not roadmap:
+        return{"error": "User not found"}
+    
+    # Find and mark task as completed
+    task_found = False
+    for month in roadmap.get("roadmap", []):
+        for week in month["weeks"]:
+            for task in week.get("daily_tasks", []):
+                if task["task_id"] == task_id:
+                    task["completed"] = True
+                    task["completed_date"] = datetime.now().isoformat()
+                    task_found = True
+
+                    #Update progress
+                    progress = roadmap.get("progress", {})
+                    progress["total_tasks_completed"] = progress.get("total_tasks_completed", 0) + 1
+
+                    #Move to next day
+                    advance_to_next_task(roadmap)
+
+                    return {
+                        "status": "success",
+                        "message": "Task completed! 🎉",
+                        "completed_task": task["title"],
+                        "total_completed": progress["total_tasks_completed"]
+                    }
+    if not task_found:
+        return{"error": "Task not found"}
+    
+def advance_to_next_task(roadmap: dict):
+    """Move user to the next task/week/month"""
+
+    progress = roadmap.get("progress", {})
+    current_month = progress.get("current_month", 1)
+    current_week = progress.get("current_week", 1)
+    current_day = progress.get("current_day", 1)
+
+    #find next incomplete task
+    for month in roadmap.get("roadmap", []):
+        if month["month">= current_month]:
+            for week in month['weeks']:
+                if (month["month"] > current_month) or (week["week"] >= current_week):
+                    for task in week.get("daily_task", []):
+                        if ((month["month"] > current_month) or (week["week"] > current_week) or (task["day"] > current_day)) and not("completed", False):
+
+                            progress["current_month"] = month["month"]
+                            progress["current_week"] = week["week"]
+                            progress["current_day"] = task["day"]
+                            return
+    #If no more tasks, mark as completed
+    progress["current_day"] = -1  #to indicate completion
+
+# YOUTUBE VIDEO RECOMMENDATION
+def get_current_week_videos(user_id: str) -> dict:
+    """Get Youtube videos for current week's focus"""
+
+    roadmap = user_store.get(user_id)
+    if not roadmap:
+        return{"error": "User not found"}
+    
+    progress = roadmap.get("progress", {})
+    current_month = progress.get("current_month", 1)
+    current_week = progress.get("current_week", 1)
+
+    # Find and extract current week focus
+
+    current_week_focus = None
+    for month in roadmap.get("roadmap", []):
+        if month["month"] == current_month:
+            for week in month["weeks"]:
+                if week["week"] == current_week:
+                    current_week_focus = week["focus"]
+                    break
+
+    if not current_week_focus:
+        return {"error": "Current week not found"}
+    
+    videos = search_youtube_videos(current_week_focus)
+
+    return {
+        "week_focus": current_week_focus,
+        "week_info": f"Month {current_month}, Week {current_week}",
+        "videos": videos,
+        "total_videos": len(videos)
+    }
+
+def search_youtube_videos(query: str, req:FullPipelineReq,max_results: int = 8) -> list:
+    """Search Youtube for target role videos"""
 
     if not YOUTUBE_API_KEY:
-        print("⚠️ No YouTube API key configured, skipping video search")
-        return []
+        print("No Youtube API key - returning sample videos")
+        return get_sample_videos(query)
     
     try:
-        search_url = "https://www.googleapis.com/youtube/v3/search"
-        details_url = "https://www.googleapis.com/youtube/v3/videos"
+        enhanced_query = f"{query} {req:target_role} tutorial coding"
 
         with httpx.Client(timeout=30.0) as client:
-            sr = client.get(search_url, params={
-                "key": YOUTUBE_API_KEY,
-                "part": "snippet",
-                "q": query,
-                "type": "video",
-                "maxResults": max_results,
-                "q": query + " tutorial",
-                "videoDuration": "long",  # > 20 min videos
-                "relevanceLanguage": "en"
-            }).json()
-            
-            ids = [item["id"]["videoId"] for item in sr.get("items", [])]
-            if not ids:
-                return []
+            #search videos
+            search_response = client.get(
+                "https://www.goggleapis.com/youtube/v3/search",params={
+                    "key": YOUTUBE_API_KEY,
+                    "part": "snippet",
+                    "q": enhanced_query,
+                    "type": "video",
+                    "maxResults": max_results,
+                    "order": "relevance",
+                    "videoDuration": "medium"
+                }
+            )
 
-            dr = client.get(details_url, params={
-                "key": YOUTUBE_API_KEY,
-                "part": "snippet,contentDetails,statistics",
-                "id": ",".join(ids)
-            }).json()
+            if not search_response.is_success:
+                return get_sample_videos(query)
             
+            search_data = search_response.json()
+            video_ids = [item["id"] ["videoId"] for item in search_data.get("items", [])]
 
-        out = []
-        for item in dr.get("items", []):
-            out.append({
-                "title":     item["snippet"]["title"],
-                "url":       f"https://www.youtube.com/watch?v={item['id']}",
-                "duration":  item["contentDetails"]["duration"],
-                "views":     item["statistics"].get("viewCount", "0"),
-                "channel":   item["snippet"]["channelTitle"]
-            })
-        return out
+            if not video_ids:
+                return get_sample_videos(query)
+            
+            #Get video details
+            details_response = client.get(
+                "https://www.googleapis.com/youtube/v3/videos", params={
+                    "key": YOUTUBE_API_KEY,
+                    "part": "snippet,contentDetails,statistics",
+                    "id": ",".join(video_ids)
+                }
+            )
+
+            if not details_response.is_success:
+                return get_sample_videos(query)
+            
+            details_data = details_response.json()
+
+            videos = []
+            for item in details_data.get("items", []):
+                video = {
+                    "title": item["snippet"]["title"],
+                    "url": f"https://www.youtube.com/watch?v={item['id']}",
+                    "thumbnail": item["snippet"]["thumbnails"]["medium"]["url"],
+                    "channel": item["snippet"]["channelTitle"],
+                    "duration": item["contentDetails"]["duration"],
+                    "views": item["statistics"].get("viewCount", "0")
+                }
+                videos.append(video)
+
+            #Sort by views
+            videos.sort(key=lambda x: int(x["views"]), reverse=True)
+            return videos[:6]
+    
     except Exception as e:
-        print(f"❌ YouTube search error: {e}")
-        return []
+        print(f"Youtube API error: {e}")
+        return get_sample_videos(query)
 
-# ─── 3) Enrich Roadmap with Videos ─────────────────────────────────────────────
-def enrich_with_videos(roadmap: dict) -> dict:
-    print("🎥 Enriching roadmap with video content...")
-    for month in roadmap.get("roadmap", []):
-        if "weeks" in month:
-            for week in month.get("weeks", []):
-                for task in week.get("tasks", []):
-                    task["videos"] = youtube_search(task["title"])
-        else:
-            # Handle flat structure
-            if "tasks" in month:
-                for task in month.get("tasks", []):
-                    task["videos"] = youtube_search(task["title"])
-    print("✅ Video enrichment complete")
-    return roadmap
+def get_sample_videos(query: str) -> list:
+    """Return sample videos when Youtube API is not available"""
+    return [
+        {
+            "title": f"{query} - Complete Tutorial",
+            "url": "https://youtube.com/watch?v=sample1",
+            "thumbnail": "https://i.ytimg.com/vi/sample/mqdefault.jpg",
+            "channel": "Programming Tutorial",
+            "duration": "PT15M30S",
+            "views": "150000",
+            "description": f"Complete tutorial on {query} for beginners..."
+        },
+        {
+            "title": f"Learn {query} in 20 Minutes",
+            "url": "https://youtube.com/watch?v=sample2",
+            "thumbnail": "https://i.ytimg.com/vi/sample/mqdefault.jpg",
+            "channel": "Code Academy",
+            "duration": "PT20M15S",
+            "views": "89000",
+            "description": f"Quick crash course on {query}..."
+        }
+    ]
 
-# ─── 4) Slice Next Daily Task ─────────────────────────────────────────────────
-def slice_daily_task(roadmap: dict) -> dict:
-    for month in roadmap.get("roadmap", []):
-        if "weeks" in month:
-            for week in month.get("weeks", []):
-                for task in week.get("tasks", []):
-                    if not task.get("done", False):
-                        return {
-                            "title":          task["title"],
-                            "goal":           roadmap["goal"],
-                            "why":            roadmap["why"],
-                            "estimated_time": task.get("estimated_time", ""),
-                            "videos":         task.get("videos", []),
-                            "done":           False
-                        }
-        else:
-            # Handle flat structure
-            if "tasks" in month:
-                for task in month.get("tasks", []):
-                    if not task.get("done", False):
-                        return {
-                            "title":          task["title"],
-                            "goal":           roadmap["goal"],
-                            "why":            roadmap["why"],
-                            "estimated_time": task.get("estimated_time", ""),
-                            "videos":         task.get("videos", []),
-                            "done":           False
-                        }
-    return {}
+# CHATBOT SYSTEM
+def get_ai_chat_response(user_id: str, message: str, req:FullPipelineReq) -> dict:
+    """Generate AI chat response based on user's roadmap context"""
 
-# ─── Endpoints ────────────────────────────────────────────────────────────────
-@app.post("/api/full_pipeline")
-def api_full_pipeline(req: FullPipelineReq):
+    roadmap = user_store.get(user_id)
+    if not roadmap:
+        return {"error": "User not found"}
+    
+    # Get user context
+    user_goal = roadmap.get("goal", "career goal")
+    current_progress = roadmap.get("progress", {})
+    total_completed = current_progress.get("total_task_completed", 0)
+
+    # Get chat history
+    if user_id not in chat_history:
+        chat_history[user_id] = []
+
+    #Build AIs context-aware prompt
+    system_prompt = f"""You are Navi, a helpful career mentor AI assitant
+
+Context about the user:
+- Career Goal: {user_goal}
+- Tasks Completed: {total_completed}
+- Learning Journey: Currently working on their {req.target_role} roadmap
+
+Your role:
+1. Answer questions about {req.target_role}, career development, and learning
+2. Provide encouragement and motivation
+3. Give practical advice based on their goal
+4. Keep responses conversational and supportive
+5. If asked about progress, reference their completed tasks
+
+Guidelines:
+- Be encouraging and positive
+- Provide practical, actionable advice
+- Keep responses under 200 words unless more detail is needed
+- Reference their goal when relevant
+"""
+    
+    # Prepare conversation history
+    messages = [{"role": "system", "content": system_prompt}]
+
+    # Add recent chat history (last  6 messages to stay within token limits)
+    recent_history = chat_history[user_id][-6:]
+    for chat in recent_history:
+        messages.append({"role": "user", "content": chat["user"]})
+        message.append({"role": "assistant", "content": chat["assistant"]})
+
+    # Add current message
+    messages.append({"role": "user", "content": message})
+
     try:
-        print(f"📥 Received request: {req.model_dump()}")
-        rm = llm_generate_roadmap(req)
+        with httpx.Client(timeout=60.0) as client:
+            response = client.post(
+                f"{GROQ_BASE_URL}/chat/completions",
+                headers={
+                    "Authorization": f"Bearer {GROQ_API_KEY}",
+                    "Content-Type": "application/json"
+                },
+                json={
+                    "model": "deepseek-r1-distill-llama-70b",
+                    "messages": messages,
+                    "temperature": 0.7,
+                    "max_tokens": 500
+                }
+            )
+        response.raise_for_status()
+        ai_response = response.json()["choices"][0]["message"]["content"]
 
-        # init done flags
-        for m in rm.get("roadmap", []):
-            if "weeks" in m:
-                for w in m.get("weeks", []):
-                    for t in w.get("tasks", []):
-                        t["done"] = False
-            else:
-                # Handle flat structure
-                if "tasks" in m:
-                    for t in m.get("tasks", []):
-                        t["done"] = False
+        # Store in chat history 
+        chat_history[user_id].append({
+            "user": message,
+            "assistant": ai_response,
+            "timestamp": datetime.now().isoformat()
+        })
 
-        rm = enrich_with_videos(rm)
-
-        user_id = str(uuid4())
-        user_store[user_id] = rm
-        print(f"✅ Pipeline completed successfully for user: {user_id}")
-        return {"user_id": user_id, "roadmap": rm}
+        #Let's keep only the last 20 conversations to manage memory
+        if len(chat_history[user_id]) > 20:
+            chat_history[user_id] = chat_history[user_id][-20:]
+        
+        return {
+            "response": ai_response,
+            "timestamp": datetime.now().isoformat()
+        }
     except Exception as e:
-        print(f"❌ Pipeline error: {e}")
-        import traceback
-        traceback.print_exc()
+        print(f"Chat error: {e}")
+        return {
+            "response": "I'm having trouble connecting right now. Please try again in a moment!",
+            "timestamp": datetime.now().isoformat()
+        }
+
+
+# API Endpoints
+
+@app.post("api/generate_roadmap")
+def api_generate_roadmap(req: FullPipelineReq):
+    """Generate intial roadmap"""
+    try:
+        roadmap = llm_generate_roadmap(req)
+        user_id = str(uuid4())
+        user_store[user_id] = roadmap
+
+        return {
+            "success": True,
+            "user_id": user_id,
+            "roadmap": roadmap,
+            "message": "Roadmap generated successfully!"
+        }
+    except Exception as e:
         raise HTTPException(500, f"Failed to generate roadmap: {str(e)}")
-
-@app.get("/api/user_roadmap/{user_id}")
-def api_user_roadmap(user_id: str):
-    rd = user_store.get(user_id)
-    if not rd:
+    
+@app.get("/api/daily_task/{user_id}")
+def api_get_daily_task(user_id:str):
+    """Get current daily task with motivation"""
+    if user_id not in user_store:
         raise HTTPException(404, "User not found")
-    return rd
-
-@app.get("/api/user_daily_task/{user_id}")
-def api_user_daily_task(user_id: str):
-    rd = user_store.get(user_id)
-    if not rd:
-        raise HTTPException(404, "User not found")
-    task = slice_daily_task(rd)
+    
+    task = get_current_daily_task(user_id)
     if not task:
-        raise HTTPException(404, "All tasks completed")
+        raise HTTPException(404, "No current task found")
+    
     return task
 
-@app.post("/api/mark_task_done/{user_id}")
-def api_mark_task_done(user_id: str):
-    rd = user_store.get(user_id)
-    if not rd:
+@app.post("/api/complete_task/{user_id}")
+def api_complete_task(user_id:str, completion: TaskCompletion):
+    """Mark current task as completed"""
+    if user_id not in user_store:
+        raise HTTPException(404, "user not found")
+    
+    # Get current task ID
+
+    current_task = get_current_daily_task(user_id)
+    if not current_task or "task_id" not in current_task:
+        raise HTTPException(404, "No current task to complete")
+    
+    result = mark_task_completed(user_id, current_task["task_id"])
+    
+    if "error" in result: 
+        raise HTTPException(400, result["error"])
+    
+    return result
+
+
+@app.get("/api/week_videos/{user_id}")
+def api_get_week_videos(user_id: str):
+    """Get Youtube videos for current week"""
+    if user_id not in user_store:
+        raise HTTPException(404, "user not found")
+    
+    videos = get_current_week_videos(user_id)
+
+    if "error" in videos:
+        raise HTTPException(404, videos["error"])
+    
+    return videos
+
+@app.get("/api/chat/{user_id}")
+def api_chat(user_id: str, chat_msg: ChatMessage):
+    """Chat with AI assistant"""
+    if user_id not in user_store:
         raise HTTPException(404, "User not found")
     
-    for month in rd.get("roadmap", []):
-        if "weeks" in month:
-            for week in month.get("weeks", []):
-                for task in week.get("tasks", []):
-                    if not task.get("done"):
-                        task["done"] = True
-                        return {"status": "ok", "marked": task}
-        else:
-            # Handle flat structure
-            if "tasks" in month:
-                for task in month.get("tasks", []):
-                    if not task.get("done"):
-                        task["done"] = True
-                        return {"status": "ok", "marked": task}
+    response = get_ai_chat_response(user_id, chat_msg.message)
+    if "error" in response:
+        raise HTTPException(400, response["error"])
     
-    raise HTTPException(400, "No pending task")
+    return response
 
-@app.get("/api/debug")
-def api_debug():
-    return {"status": "Backend is running", "user_count": len(user_store)}
+@app.get("/api/user_progress/{user_id}")
+def api_get_user_progress(user_id: str):
+    """Get user's overall progress"""
+    if user_id not in user_store:
+        raise HTTPException(404, "User not found")
+    
+    roadmap = user_store[user_id]
+    progress = roadmap.get("progress", {})
 
-@app.post("/api/debug_request")
-def api_debug_request(data: dict):
-    print(f"📥 Raw request data: {data}")
-    return {"received": data, "type": type(data)}
+    # Calculate completion percentage
+    total_tasks = 0
+    completed_tasks = progress.get("total_tasks_completed", 0)
 
-# Health check endpoint
-@app.get("/api/health")
+    for month in roadmap.get("roadmap", []):
+        for week in month["weeks"]:
+            total_tasks += len(week.get("daily_tasks", []))
+    
+    completion_percentage = (completed_tasks / total_tasks * 100) if total_tasks > 0 else 0
+
+    return {
+        "goal": roadmap.get("goal", ""),
+        "total_tasks": total_tasks,
+        "completed_tasks": completed_tasks,
+        "completion_percentage": round(completion_percentage, 1),
+        "current_month": progress.get("current_month", 1),
+        "current_week": progress.get("current_week", 1),
+        "current_day": progress.get("current_day", 1),
+        "start_date": progress.get("start_date", 1)
+    }
+
+
+@app.get("api/health")
 def health_check():
     return {
         "status": "healthy",
-        "groq_configured": bool(GROQ_API_KEY),
+        "active_users": len(user_store),
+        "grow_configured": bool(GROQ_API_KEY),
         "youtube_configured": bool(YOUTUBE_API_KEY)
     }
 
+
+#  Legacy endpoint for compatibility
+@app.post("/api/full_pipeline")
+def api_full_pipeline(req: FullPipelineReq):
+    """Legacy endpoint - redirects to new generate_roadmap"""
+    return api_generate_roadmap(req)
+
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("agent_orchestra:app", host="127.0.0.1", port=8000, reload=True)
+    uvicorn.run("agent_orhcestra:app", host="127.0.0.1", port=8000, reload=True)
