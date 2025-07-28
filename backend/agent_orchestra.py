@@ -92,7 +92,7 @@ Requirements:
 2. Break the roadmap into clear weekly stages based on their learning speed and timeframe.
 3. Each week must have a specific "focus" (e.g., "JavaScript DOM Manipulation", "React Hooks", "CSS Flexbox and Grid").
 4. Each task chould be achievable in 1-3 hours
-5. Each week should have 5-7 daily tasks.
+5. Each week should have 5 daily tasks.
 6. Match tasks and concepts with the user's skill level.
 7. Ensure everything can fit within the timeframe realistically.
 8. Use only **free resources** (e.g., FreeCodeCamp, Scrimba, MDN, Youtube).
@@ -625,13 +625,13 @@ def api_get_week_videos(user_id: str):
     
     return videos
 
-@app.get("/api/chat/{user_id}")
-def api_chat(user_id: str, chat_msg: ChatMessage):
+@app.post("/api/chat/{user_id}")
+async def api_chat(user_id: str, chat_msg: ChatMessage):
     """Chat with AI assistant"""
     if user_id not in user_store:
         raise HTTPException(404, "User not found")
     
-    response = get_ai_chat_response(user_id, chat_msg.message)
+    response = get_ai_chat_response(user_id, chat_msg.message, None)  # Added None as req parameter
     if "error" in response:
         raise HTTPException(400, response["error"])
     

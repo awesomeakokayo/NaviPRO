@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script defer src="script.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Allura&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
     </style>
@@ -14,17 +15,17 @@
     <div class="navigation" id="navigation">
         <div class="top-navigation">
             <div class="logo">
-                <img src="Images/Navipro-watermark.png" alt="logo">NaviPro
+                <img src="Images/Navipro-watermark.png" alt="logo"> <span class="pro">NaviPro</span>
             </div>
-            <a href="#" class="nav-button"><button><img width="27" height="27" src="https://img.icons8.com/fluency-systems-regular/48/FFFFFF/dashboard-layout.png" alt="dashboard-layout"/> Dashboard</button></a>
-            <a href="#" class="nav-button"><button><img width="27" height="27" src="https://img.icons8.com/small/16/FFFFFF/clipboard.png" alt="clipboard"/> My Tasks</button></a>
-            <a href="#" class="nav-button"><button><img width="27" height="27" src="https://img.icons8.com/fluency-systems-regular/48/FFFFFF/purposeful-man.png" alt="purposeful-man"/> My Career Path</button></a>
-            <a href="#" class="nav-button"><button><img width="27" height="27" src="https://img.icons8.com/fluency-systems-regular/48/FFFFFF/literature--v1.png" alt="literature--v1"/> Resources</button></a>
+            <a href="#" class="nav-button"><button><img width="24" height="24" src="https://img.icons8.com/fluency-systems-regular/48/FFFFFF/dashboard-layout.png" alt="dashboard-layout"/> Dashboard</button></a>
+            <a href="#" class="nav-button"><button class="nav-button"><img width="24" height="24" src="https://img.icons8.com/small/16/FFFFFF/clipboard.png" alt="clipboard"/> My Tasks</button></a>
+            <a href="#" class="nav-button"><button><img width="24" height="24" src="https://img.icons8.com/fluency-systems-regular/48/FFFFFF/purposeful-man.png" alt="purposeful-man"/> My Career Path</button></a>
+            <a href="#" class="nav-button"><button><img width="24" height="24" src="https://img.icons8.com/fluency-systems-regular/48/FFFFFF/literature--v1.png" alt="literature--v1"/> Resources</button></a>
         </div>
 
         <div class="bottom-navigation">
-            <a href="#" class="nav-button"><button><img width="27" height="27" src="https://img.icons8.com/fluency-systems-regular/48/FFFFFF/logout-rounded.png" alt="logout-rounded"/> Logout</button></a>
-            <a href="#" class="nav-button"><button><img width="27" height="27" src="https://img.icons8.com/external-anggara-glyph-anggara-putra/32/FFFFFF/external-Setting-user-interface-anggara-basic-outline-anggara-putra-2.png" alt="external-Setting-user-interface-anggara-basic-outline-anggara-putra-2"/> Settings</button></a>
+            <a href="#" class="nav-button"><button><img width="24" height="24" src="https://img.icons8.com/fluency-systems-regular/48/FFFFFF/logout-rounded.png" alt="logout-rounded"/> Logout</button></a>
+            <a href="#" class="nav-button"><button><img width="24" height="24" src="https://img.icons8.com/external-anggara-glyph-anggara-putra/32/FFFFFF/external-Setting-user-interface-anggara-basic-outline-anggara-putra-2.png" alt="external-Setting-user-interface-anggara-basic-outline-anggara-putra-2"/> Settings</button></a>
         </div>
     </div>
 
@@ -45,7 +46,7 @@
 
         <div class="content">
             <div class="welcome">
-                <div>
+                <div class="welcome-user">
                     <p class="name">Welcome Alex</p>
                     <h2>Stay focused on your core mission - Product Design</h2>
                 </div>
@@ -71,7 +72,7 @@
                             </div>
                         </div>
                         
-                        <canvas id="momentumChart" height="100px" width="190px"></canvas>
+                        <canvas id="momentumChart" width="250" height="150"></canvas>
 
                         <div class="navi-box">
                             <img src="Images/Frame 3.png" class="navi-icon" alt="Navi Icon">
@@ -79,7 +80,7 @@
                         </div>
                     </div>
 
-                    <div class="task">
+                    <div id="taskContainer" class="task">
                         <div class="task-header">
                             <span class="active-task"> <img width="25" height="25" src="https://img.icons8.com/?size=100&id=KPXIRLDghgMh&format=png&color=737373" alt=""> <span>Active Task</span></span>
 
@@ -147,11 +148,13 @@
                 <div class="right-progress-section">
                     <div class="progress-card">
                         <div class="title">
-                            <img width="20" height="20" src="Images/chart1.png" />
+                            <img width="24" height="24" src="Images/chart1.png" />
                             <span class="title1">Your overall progress</span>
                         </div>
-                        <div class="progress-section">
-                            <canvas id="progressChart" width="180" height="180"></canvas>
+                        <div class="progress-section1">
+                            <div class="doughnut">
+                                <canvas id="progressChart" width="200" height="200"></canvas>
+                            </div>
                             <div class="milestone">
                                 <a href="#" class="milestone-title"><img width="23" height="23" src="Images/next.png" alt="">Next Milestone</a>
                                 <div class="milestone-sub">Design Systems</div>
@@ -169,17 +172,17 @@
                         <div class="summary">
                             <div class="summary-box">
                                 <img class="second-icon" width="25" height="25" src="https://img.icons8.com/?size=100&id=11751&format=png&color=FFFFFF" alt="">
-                                <h3>8</h3>
+                                <h3 class="completed-tasks">8</h3>
                                 <p>Completed</p>
                             </div>
                             <div class="summary-box1">
                                 <img class="middle-icon" height="25" width="25" src="https://img.icons8.com/?size=100&id=82767&format=png&color=FFFFFF" alt="">
-                                <h3>12</h3>
+                                <h3 class="in-progress-tasks">12</h3>
                                 <p>In progress</p>
                             </div>
                             <div class="summary-box">
                                 <img class="last-icon" width="27" height="27" src="https://img.icons8.com/?size=100&id=59878&format=png&color=FFFFFF" alt="">
-                                <h3>20</h3>
+                                <h3 class="upcoming-tasks">20</h3>
                                 <p>Upcoming</p>
                             </div>
                         </div>
@@ -192,7 +195,7 @@
                             </span> <a href="#"><img width="20" height="20" src="https://img.icons8.com/?size=100&id=102729&format=png&color=737373" alt=""></a>
                         </div>
                         <div class="videos">
-                            <div class="recommendations">
+                            <div id="videoContainer" class="recommendations">
                                 <span class="video-content">
                                     <span><a href="#"><img class="video-cover" width="80" height="50" src="Images/youtube cover 1.png" alt=""></a></span>
                                     <span class="video-about">
@@ -261,28 +264,6 @@
 
                                 <span class="video-content">
                                     <span><a href="#"><img class="video-cover" width="80" height="50" src="Images/youtube cover 1.png" alt=""></a></span>
-                                    <span class="video-about">
-                                        <span class="video-title">
-                                            <a class="video-title" href="#">Advanced Figma techniques</a>
-                                        </span>
-                                        <span class="video-detail">
-                                            <span class="author-duration">
-                                                <span class="video-author">Design Academy • </span>
-                                                <span class="video-duration"> 2h • </span>
-                                            </span>
-                                            <span class="source"> <img width="25" height="15" src="https://png.pngtree.com/png-vector/20221018/ourmid/pngtree-youtube-social-media-icon-png-image_6315995.png" alt=""></span>
-                                        </span>
-                                    </span>
-                                    <span class="ratings">
-                                        <span class="star">
-                                            <img width="15" height="15" src="https://img.icons8.com/?size=100&id=MVWV8hpGIZqp&format=png&color=FD7E14" alt="">
-                                        </span> 
-                                        <span class="rating">4.5</span>
-                                    </span>
-                                </span>
-
-                                <span class="video-content">
-                                    <span><a href="#"><img class="video-cover" width="80" height="50" src="Images/youtube cover 2.png" alt=""></a></span>
                                     <span class="video-about">
                                         <span class="video-title">
                                             <a class="video-title" href="#">Advanced Figma techniques</a>

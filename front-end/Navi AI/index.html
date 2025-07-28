@@ -13,29 +13,28 @@
 
   <div class="top-div">
     <div></div>
-    <div> <a class="dashboard-link" href="#">Go to dashboard →</a> </div>
+    <div><a class="dashboard-link" href="#">Go to dashboard →</a></div>
   </div>
 
   <div class="container">
     <div class="direct-message">
-      <!-- 👇 Dynamic chat content will be injected here by JavaScript -->
-    </div>
-
-    <div class="input-wrapper">
-      <div class="send-message">
-        <div class="box">
-          <div>
-            <textarea placeholder="Message Navi" rows="1"></textarea>
-          </div>
-          <div>
-            <span class="split">|</span>
-            <button onclick="sendMessage()">↑</button>
-          </div>
-        </div>
-        <div class="disclaimer">
-          Navi can sometimes make mistakes, verify important information.
+      <div class="chat-container">
+        <div><img src="Images/Frame 3.png" alt="logo"></div>
+        <div class="ai-chat">
+          <div class="ai-name">Navi</div>
+          <div>Hi! I'm Navi, your AI career guide. How can I help you today?</div>
         </div>
       </div>
+    </div>
+  </div>
+
+  <div class="send-message">
+    <div class="box">
+      <textarea rows="1" placeholder="Message Navi..." class="auto-expand"></textarea>
+      <button onclick="sendMessage()">↑</button>
+    </div>
+    <div class="disclaimer">
+      Navi can sometimes make mistakes, verify important information.
     </div>
   </div>
 

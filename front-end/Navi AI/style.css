@@ -15,13 +15,13 @@ body{
 }
 
 .top-div {
-    width: 100%; /* full viewport width */
+    width: 100%; 
     max-width: 1200px;
     display: flex;
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
-    padding: 1rem 5rem; /* optional: increase space from edges */
+    padding: 1rem 5rem; 
     box-sizing: border-box;
 }
 
@@ -35,19 +35,23 @@ body{
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
     max-width: 100%;
-    height: 70vh;
+    height: calc(100vh - 180px); 
     width: 100%;
     padding: 0 5rem;
     position: relative;
-    direction: rtl;
+    margin-bottom: 120px; 
 }
 
 .direct-message{
     flex: 1;
     overflow-y: auto;
-    padding-left: 5rem;
+    width: 100%;
+    padding: 1rem;
+    padding-left: 3rem; 
+    scroll-behavior: smooth;
+    direction: rtl;
 }
     
 .chat-container{
@@ -77,14 +81,12 @@ body{
     gap: 0.8rem;
 }
 
-/* Default: AI chat aligned to left */
 .chat-container .ai-chat {
     padding: 0.8rem;
     border-radius: 0.6rem;
     max-width: 70%;
 }
 
-/* User message aligned to the right */
 .chat-container.user {
     flex-direction: row-reverse;
 }
@@ -121,18 +123,23 @@ img{
     position: fixed;
     transform: translateX(-50%);
     bottom: 0;
+    background-color: white;
+    padding: 1rem;
+    border-top: 1px solid #eee;
 }
 
 .direct-message::-webkit-scrollbar {
     width: 10px;
+    margin-right: 1rem;
 }
 
 .direct-message::-webkit-scrollbar-track {
     background: #f1f1f1;
+    border-radius: 6px;
 }
 
 .direct-message::-webkit-scrollbar-thumb {
-    background-color: #1B455B; /* Change this to your desired color */
+    background-color: #1B455B;
     border-radius: 6px;
 }
 
@@ -151,11 +158,10 @@ img{
     position: fixed;
     bottom: 0;
     left: 50%;
-    margin: 0.7rem;
-    gap: 20px;
-    display: flex;
-    justify-content: space-between;
+    transform: translateX(-50%);
     background-color: white;
+    padding: 1rem;
+    border-top: 1px solid #eee;
 }
 
 .box{
@@ -166,7 +172,33 @@ img{
     border-radius: 8px;
     width: 100%;
     font-size: 20px;
-    align-items: center;
+    align-items: flex-start; 
+    gap: 10px;
+}
+
+.box input {
+    flex: 1; 
+    border: none;
+    outline: none;
+    font-size: 16px;
+    font-family: 'Poppins', sans-serif;
+    width: 100%;
+    padding: 0.5rem;
+}
+
+.box textarea {
+    flex: 1;
+    border: none;
+    outline: none;
+    font-size: 16px;
+    font-family: 'Poppins', sans-serif;
+    padding: 0.5rem;
+    resize: none;
+    overflow-y: hidden;
+    min-height: 40px;
+    max-height: 150px;
+    line-height: 1.4;
+    width: 100%;
 }
 
 textarea{
@@ -192,10 +224,13 @@ textarea:focus{
 .box button{
     border: none;
     background: inherit;
-    padding-left: 1rem;
-    padding-right: 1rem;
+    padding: 0.5rem;
     font-size: larger;
     cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 40px;
 }
 
 .disclaimer{
