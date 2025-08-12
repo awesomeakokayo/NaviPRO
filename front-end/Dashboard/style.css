@@ -575,3 +575,234 @@ b{
     width: 100% !important;
     height: 150px !important;
 }
+
+/* Hamburger Menu Icon */
+.hamburger {
+    display: none;
+    cursor: pointer;
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    z-index: 1001;
+    background: none;
+    border: none;
+    padding: 0;
+}
+
+.hamburger span {
+    display: block;
+    width: 25px;
+    height: 3px;
+    margin: 5px 0;
+    background: #1A4156;
+    transition: all 0.3s ease;
+}
+
+/* Mobile Responsive Styles */
+@media screen and (max-width: 768px) {
+    .hamburger {
+        display: block;
+        top: 20px;
+        right: 20px;  /* Changed from left to right */
+        left: auto;   /* Reset left position */
+    }
+
+    .navigation {
+        transform: translateX(-100%);
+        position: fixed;
+        width: 80%;
+        max-width: 300px;
+        transition: transform 0.3s ease;
+        z-index: 1000;
+    }
+
+    .navigation.active {
+        transform: translateX(0);
+    }
+
+    .dashboard-layout {
+        margin-left: 0;
+        width: 100%;
+    }
+
+    .icons {
+        padding: 15px;
+        margin-top: 10px;
+    }
+
+    .content {
+        padding: 15px;
+    }
+
+    /* Welcome Section */
+    .welcome {
+        padding: 20px;
+        flex-direction: column;
+        gap: 20px;
+        background-size: cover;
+    }
+
+    .welcome h2 {
+        font-size: 1.2rem;
+        line-height: 1.4;
+    }
+
+    .name {
+        font-size: 1.8rem !important;
+    }
+
+    /* Progress Section */
+    .progress-section {
+        flex-direction: column;
+    }
+
+    .left-progress-section,
+    .right-progress-section {
+        width: 100%;
+    }
+
+    /* Chart Adjustments */
+    .tracker-card {
+        height: auto;
+        margin: 10px 0;
+    }
+
+    #momentumChart {
+        height: 200px !important;
+    }
+
+    .custom-legend {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 15px;
+        margin: 10px 0;
+    }
+
+    /* Task Container */
+    .task {
+        height: auto;
+        margin: 10px 0;
+    }
+
+    .task-lists1 {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    /* Skill Section */
+    .skill {
+        height: auto;
+        margin: 10px 0;
+    }
+
+    /* Progress Card */
+    .progress-card {
+        height: auto;
+        margin: 10px 0;
+    }
+
+    .progress-section1 {
+        flex-direction: column;
+        height: auto;
+        align-items: center;
+        gap: 20px;
+    }
+
+    .doughnut {
+        width: 100%;
+        max-width: 200px;
+    }
+
+    .milestone {
+        width: 100%;
+        text-align: center;
+    }
+
+    /* Summary Boxes */
+    .summary {
+        flex-direction: column;
+        height: auto;
+        padding: 10px;
+    }
+
+    .summary-box,
+    .summary-box1 {
+        border: none;
+        padding: 10px 0;
+        border-bottom: 1px solid #eee;
+    }
+
+    /* Video Recommendations */
+    .video-recommendation {
+        height: auto;
+        margin: 10px 0;
+    }
+
+    .video-content {
+        flex-direction: column;
+        padding: 10px;
+    }
+
+    .video-cover {
+        width: 100%;
+        height: auto;
+        max-width: 200px;
+        margin: 0 auto;
+    }
+
+    .video-about {
+        width: 100%;
+        padding: 10px 0;
+    }
+
+    .video-title {
+        font-size: 0.9rem;
+    }
+
+    /* Navi Box */
+    .navi-box {
+        margin: 10px 0;
+        padding: 10px;
+    }
+
+    .navi-text {
+        font-size: 0.9rem;
+    }
+
+    .icons-left {
+        margin-right: 50px; /* Add space for hamburger menu */
+    }
+}
+
+/* Extra small devices */
+@media screen and (max-width: 480px) {
+    .welcome h2 {
+        font-size: 1rem;
+    }
+
+    .name {
+        font-size: 1.5rem !important;
+    }
+
+    .task-lists {
+        font-size: 0.8rem;
+    }
+
+    .video-author,
+    .video-duration {
+        font-size: 0.7rem;
+    }
+}
+
+/* Active hamburger menu styles */
+.hamburger.active span:nth-child(1) {
+    transform: rotate(45deg) translate(5px, 5px);
+}
+
+.hamburger.active span:nth-child(2) {
+    opacity: 0;
+}
+
+.hamburger.active span:nth-child(3) {
+    transform: rotate(-45deg) translate(7px, -7px);
+}

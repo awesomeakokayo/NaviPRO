@@ -39,10 +39,8 @@ class TaskCompletion(BaseModel):
 class FullPipelineReq(BaseModel):
     goal: str
     target_role: Optional[str] = ""
-    why: str
     timeframe: str
     hours_per_week: Optional[str] = "10"
-    skills: Optional[list[str]] = []
     learning_style: Optional[str] = "visual"
     learning_speed: Optional[str] = "average"
     skill_level: Optional[str] = "beginner"
@@ -72,7 +70,7 @@ def regroup_by_month(flat_weeks: list[dict], weeks_per_month: int = 4) -> list[d
 
 #LLM-based Roadmap Generation
 def llm_generate_roadmap(req: FullPipelineReq) -> dict:
-    """Generate comprehensive roadmap with weekly focuses and daiaaly taks"""
+    """Generate comprehensive roadmap with weekly focuses and daily taks"""
     print(f" Generating roadmap for: {req.goal}")
     
     if not GROQ_API_KEY:
@@ -102,7 +100,6 @@ Requirements:
 JSON format:
 {
     "goal": "...",
-    "why": "...",
     "timeframe": "...",
     "learning_speed": "...",
     "skill_level": "...",
@@ -132,8 +129,7 @@ JSON format:
     user_prompt = f"""Create a {req.timeframe} roadmap for:
 
 Goal: {req.goal}
-Target Role: {req.target_role}  
-Why: {req.why}
+Target Role: {req.target_role}
 Available Time: {req.hours_per_week} hours per week
 Current Skills: {', '.join(req.skills) if req.skills else 'None'}
 Learning Style: {req.learning_style}

@@ -577,3 +577,45 @@ function refreshProgressSection() {
 
 // Optional: Refresh every 5 minutes
 setInterval(refreshProgressSection, 300000);
+
+// Add at the end of your existing JavaScript
+document.addEventListener('DOMContentLoaded', function() {
+    const menuToggle = document.getElementById('menuToggle');
+    const navigation = document.getElementById('navigation');
+    
+    menuToggle.addEventListener('click', function() {
+        navigation.classList.toggle('active');
+        menuToggle.classList.toggle('active');
+    });
+
+    // Close menu when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!navigation.contains(e.target) && !menuToggle.contains(e.target)) {
+            navigation.classList.remove('active');
+            menuToggle.classList.remove('active');
+        }
+    });
+
+    // Adjust charts on window resize
+    window.addEventListener('resize', function() {
+        if (window.innerWidth <= 768) {
+            if (momentumChart) {
+                momentumChart.options.maintainAspectRatio = false;
+                momentumChart.update();
+            }
+            if (progressChart) {
+                progressChart.options.maintainAspectRatio = false;
+                progressChart.update();
+            }
+        } else {
+            if (momentumChart) {
+                momentumChart.options.maintainAspectRatio = true;
+                momentumChart.update();
+            }
+            if (progressChart) {
+                progressChart.options.maintainAspectRatio = true;
+                progressChart.update();
+            }
+        }
+    });
+});
