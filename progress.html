@@ -1,180 +1,445 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Overall Progress</title>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      background: #f5f5f5;
-      padding: 2rem;
-      display: flex;
-      justify-content: center;
-    }
-    .progress-card {
-      background: #fff;
-      border-radius: 16px;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-      padding: 2rem;
-      max-width: 500px;
-      width: 100%;
-    }
-    .title {
-      font-size: 1rem;
-      color: #888;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      margin-bottom: 1rem;
-    }
-    .progress-section {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-    .milestone {
-      margin-left: 1.5rem;
-    }
-    .milestone-title {
-      font-weight: 600;
-    }
-    .milestone-sub {
-      color: #777;
-      font-size: 0.85rem;
-    }
-    .advance-button {
-      background: #f9f9f9;
-      border: 1px solid #ddd;
-      padding: 0.4rem 1rem;
-      border-radius: 8px;
-      font-size: 0.9rem;
-      cursor: pointer;
-      margin: 0.5rem 0;
-    }
-    .streak {
-      color: #ff5722;
-      font-size: 0.9rem;
-      display: flex;
-      align-items: center;
-      gap: 0.3rem;
-    }
-    .navi-box {
-      display: flex;
-      align-items: center;
-      justify-content: flex-start;
-      gap: 0.5rem;
-      margin-top: 1.5rem;
-      font-size: 0.9rem;
-      color: #333;
-    }
-    .navi-box span {
-      color: #f39c12;
-      font-weight: 600;
-    }
-    .summary {
-      display: flex;
-      justify-content: space-between;
-      margin-top: 1.5rem;
-    }
-    .summary-box {
-      flex: 1;
-      padding: 1rem 0;
-      border-radius: 12px;
-      background: #f9f9f9;
-      margin: 0 0.5rem;
-    }
-    .summary-box:first-child {
-      margin-left: 0;
-    }
-    .summary-box:last-child {
-      margin-right: 0;
-    }
-    .summary-box h3 {
-      margin: 0;
-      font-size: 1.2rem;
-    }
-    .summary-box p {
-      margin: 0.3rem 0 0;
-      font-size: 0.85rem;
-      color: #555;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Course Timeline</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .timeline-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            position: relative;
+            padding: 60px 0;
+        }
+
+        /* Central vertical line */
+        .timeline-line {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 2px;
+            height: calc(100% - 120px);
+            background-color: #d1d5db;
+            top: 60px;
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 80px;
+            min-height: 200px;
+        }
+
+        /* Central numbered circles */
+        .timeline-number {
+            position: absolute;
+            left: 50%;
+            top: 20px;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 60px;
+            background-color: #2563eb;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+            z-index: 10;
+        }
+
+        /* Month badge positioning */
+        .month-section {
+            position: absolute;
+            left: 50%;
+            top: -40px;
+            transform: translateX(-50%);
+            text-align: center;
+        }
+
+        .month-badge {
+            display: inline-flex;
+            align-items: center;
+            background-color: #2563eb;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .month-dot {
+            width: 6px;
+            height: 6px;
+            background: white;
+            border-radius: 50%;
+            margin-right: 6px;
+        }
+
+        .month-subtitle {
+            color: #6b7280;
+            font-size: 11px;
+            white-space: nowrap;
+        }
+
+        /* Content positioning */
+        .content-left {
+            position: absolute;
+            right: 52%;
+            top: 0;
+            width: 45%;
+            text-align: right;
+        }
+
+        .content-right {
+            position: absolute;
+            left: 52%;
+            top: 0;
+            width: 45%;
+            text-align: left;
+        }
+
+        /* Week indicator */
+        .week-indicator {
+            display: inline-flex;
+            align-items: center;
+            color: #6b7280;
+            font-size: 12px;
+            font-weight: 500;
+            margin-bottom: 12px;
+        }
+
+        .week-dot {
+            width: 4px;
+            height: 4px;
+            background: #9ca3af;
+            border-radius: 50%;
+            margin-right: 6px;
+        }
+
+        .week-number {
+            color: #2563eb;
+            font-weight: 600;
+        }
+
+        /* Content cards */
+        .content-card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+            border: 1px solid #e5e7eb;
+            position: relative;
+        }
+
+        .content-title {
+            font-size: 14px;
+            font-weight: bold;
+            color: #1f2937;
+            margin-bottom: 12px;
+        }
+
+        /* List items */
+        .content-list {
+            list-style: none;
+        }
+
+        .content-list li {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 6px;
+            color: #4b5563;
+            font-size: 12px;
+            line-height: 1.4;
+        }
+
+        .list-bullet {
+            width: 3px;
+            height: 3px;
+            background: #6b7280;
+            border-radius: 50%;
+            margin-top: 6px;
+            flex-shrink: 0;
+        }
+
+        .content-left .list-bullet {
+            order: 2;
+            margin-left: 8px;
+        }
+
+        .content-right .list-bullet {
+            order: 1;
+            margin-right: 8px;
+        }
+
+        .content-left .content-list li {
+            text-align: right;
+            justify-content: flex-end;
+        }
+
+        /* Decorative blobs */
+        .blob {
+            position: absolute;
+            border-radius: 50%;
+            opacity: 0.15;
+            z-index: 1;
+        }
+
+        .blob-1 {
+            top: 120px;
+            right: 100px;
+            width: 80px;
+            height: 60px;
+            background: #93c5fd;
+            border-radius: 40px 60px 40px 60px;
+        }
+
+        .blob-2 {
+            top: 320px;
+            left: 80px;
+            width: 100px;
+            height: 100px;
+            background: #93c5fd;
+            border-radius: 50% 60% 40% 70%;
+        }
+
+        .blob-3 {
+            top: 580px;
+            right: 120px;
+            width: 90px;
+            height: 70px;
+            background: #93c5fd;
+            border-radius: 60% 40% 60% 40%;
+        }
+
+        .blob-4 {
+            bottom: 150px;
+            left: 60px;
+            width: 40px;
+            height: 40px;
+            background: #2563eb;
+            opacity: 0.1;
+        }
+
+        /* Special styling for visual elements */
+        .visual-element {
+            position: absolute;
+            opacity: 0.3;
+        }
+
+        .smiley {
+            top: 340px;
+            left: 60px;
+            font-size: 60px;
+            color: #93c5fd;
+            z-index: 2;
+        }
+
+        .laptop {
+            top: 580px;
+            right: 80px;
+            font-size: 50px;
+            color: #93c5fd;
+            z-index: 2;
+        }
+
+        .zip-text {
+            bottom: 180px;
+            left: 80px;
+            font-size: 36px;
+            font-weight: bold;
+            color: #93c5fd;
+            z-index: 2;
+            transform: rotate(-10deg);
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .timeline-container {
+                padding: 20px 0;
+            }
+
+            .timeline-line {
+                display: none;
+            }
+
+            .timeline-item {
+                margin-bottom: 60px;
+            }
+
+            .timeline-number {
+                position: relative;
+                left: auto;
+                top: auto;
+                transform: none;
+                margin: 0 auto 20px;
+            }
+
+            .month-section {
+                position: relative;
+                left: auto;
+                top: auto;
+                transform: none;
+                margin-bottom: 20px;
+            }
+
+            .content-left,
+            .content-right {
+                position: relative;
+                left: auto;
+                right: auto;
+                top: auto;
+                width: 100%;
+                text-align: left;
+            }
+
+            .content-left .content-list li {
+                text-align: left;
+                justify-content: flex-start;
+            }
+
+            .content-left .list-bullet {
+                order: 1;
+                margin-right: 8px;
+                margin-left: 0;
+            }
+
+            .blob,
+            .visual-element {
+                display: none;
+            }
+        }
+    </style>
 </head>
 <body>
-  <div class="progress-card">
-    <div class="title">
-      <img src="https://img.icons8.com/ios-glyphs/30/888888/combo-chart.png" width="16" />
-      Your overall progress
-    </div>
-    <div class="progress-section">
-      <canvas id="progressChart" width="120" height="120"></canvas>
-      <div class="milestone">
-        <div class="milestone-title">Next Milestone</div>
-        <div class="milestone-sub">Design Systems</div>
-        <button class="advance-button">Advance →</button>
-        <div class="streak">🔥 5 - day streak</div>
-      </div>
-    </div>
+    <div class="timeline-container">
+        <!-- Central timeline line -->
+        <div class="timeline-line"></div>
+        
+        <!-- Decorative elements -->
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+        <div class="blob blob-4"></div>
+        
+        <div class="visual-element smiley">&#128578;</div>
+        <div class="visual-element laptop">&#128187;</div>
+        <div class="visual-element zip-text">ZIP</div>
 
-    <div class="navi-box">
-      <img src="https://img.icons8.com/external-flat-juicy-fish/60/000000/external-rocket-startup-flat-flat-juicy-fish.png" width="24" />
-      <span>Navi</span>: You’re right on track, don’t let up now!
-    </div>
+        <!-- Timeline Item 1 -->
+        <div class="timeline-item">
+            <div class="month-section">
+                <div class="month-badge">
+                    <div class="month-dot"></div>
+                    Month 1
+                </div>
+                <div class="month-subtitle">Foundation & Skills Building</div>
+            </div>
+            
+            <div class="timeline-number">01</div>
+            
+            <div class="content-left">
+                <div class="week-indicator">
+                    <div class="week-dot"></div>
+                    <span class="week-number">Week 1</span>
+                </div>
+                
+                <div class="content-card">
+                    <h3 class="content-title">Design Fundamentals</h3>
+                    <ul class="content-list">
+                        <li><span>Complete design principles course</span><span class="list-bullet"></span></li>
+                        <li><span>Study colour theory and typography</span><span class="list-bullet"></span></li>
+                        <li><span>Practice basic composition rules</span><span class="list-bullet"></span></li>
+                        <li><span>Set up design workspace (Figma/Sketch)</span><span class="list-bullet"></span></li>
+                        <li><span>Join design communities online</span><span class="list-bullet"></span></li>
+                        <li><span>Create first mood board</span><span class="list-bullet"></span></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
 
-    <div class="summary">
-      <div class="summary-box" style="color: #2ecc71;">
-        <h3>8</h3>
-        <p>Completed</p>
-      </div>
-      <div class="summary-box" style="color: #264653;">
-        <h3>12</h3>
-        <p>In progress</p>
-      </div>
-      <div class="summary-box" style="color: #b0b0b0;">
-        <h3>20</h3>
-        <p>Upcoming</p>
-      </div>
-    </div>
-  </div>
+        <!-- Timeline Item 2 -->
+        <div class="timeline-item">
+            <div class="timeline-number">02</div>
+            
+            <div class="content-right">
+                <div class="week-indicator">
+                    <div class="week-dot"></div>
+                    <span class="week-number">Week 2</span>
+                </div>
+                
+                <div class="content-card">
+                    <h3 class="content-title">UX Research Basics</h3>
+                    <ul class="content-list">
+                        <li><span class="list-bullet"></span><span>Learn user research methods</span></li>
+                        <li><span class="list-bullet"></span><span>Practice creating user personas</span></li>
+                        <li><span class="list-bullet"></span><span>Study competitor analysis techniques</span></li>
+                        <li><span class="list-bullet"></span><span>Complete UX research course</span></li>
+                        <li><span class="list-bullet"></span><span>Interview 3 potential users</span></li>
+                        <li><span class="list-bullet"></span><span>Create user journey maps</span></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
 
-  <script>
-    const ctx = document.getElementById('progressChart').getContext('2d');
-    new Chart(ctx, {
-      type: 'doughnut',
-      data: {
-        datasets: [{
-          data: [8, 12, 20],
-          backgroundColor: ['#2ecc71', '#264653', '#b0b0b0'],
-          borderWidth: 0,
-          cutout: '75%'
-        }]
-      },
-      options: {
-        responsive: false,
-        plugins: {
-          tooltip: { enabled: false },
-          legend: { display: false },
-        }
-      },
-      plugins: [{
-        id: 'centerText',
-        beforeDraw(chart) {
-          const { width, height, ctx } = chart;
-          ctx.restore();
-          const fontSize = (height / 5).toFixed(2);
-          ctx.font = `${fontSize}px 'Segoe UI'`;
-          ctx.textBaseline = 'middle';
-          ctx.fillStyle = '#000';
-          const text = '49%';
-          const textX = Math.round((width - ctx.measureText(text).width) / 2);
-          const textY = height / 2;
-          ctx.fillText(text, textX, textY);
-          ctx.save();
-        }
-      }]
-    });
-  </script>
+        <!-- Timeline Item 3 -->
+        <div class="timeline-item">
+            <div class="timeline-number">03</div>
+            
+            <div class="content-left">
+                <div class="week-indicator">
+                    <div class="week-dot"></div>
+                    <span class="week-number">Week 3</span>
+                </div>
+                
+                <div class="content-card">
+                    <h3 class="content-title">Wireframing & Prototyping</h3>
+                    <ul class="content-list">
+                        <li><span>Master wireframing techniques</span><span class="list-bullet"></span></li>
+                        <li><span>Learn prototyping tools</span><span class="list-bullet"></span></li>
+                        <li><span>Create low-fidelity wireframes</span><span class="list-bullet"></span></li>
+                        <li><span>Build interactive prototypes</span><span class="list-bullet"></span></li>
+                        <li><span>Study information architecture</span><span class="list-bullet"></span></li>
+                        <li><span>Practice rapid ideation methods</span><span class="list-bullet"></span></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Timeline Item 4 -->
+        <div class="timeline-item">
+            <div class="timeline-number">04</div>
+            
+            <div class="content-right">
+                <div class="week-indicator">
+                    <div class="week-dot"></div>
+                    <span class="week-number">Week 4</span>
+                </div>
+                
+                <div class="content-card">
+                    <h3 class="content-title">Visual Design Skills</h3>
+                    <ul class="content-list">
+                        <li><span class="list-bullet"></span><span>Advanced typography techniques</span></li>
+                        <li><span class="list-bullet"></span><span>Color palettes creation</span></li>
+                        <li><span class="list-bullet"></span><span>Icon design principles</span></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 </html>

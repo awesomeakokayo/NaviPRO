@@ -3,433 +3,340 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' http://127.0.0.1:8000; script-src 'self' 'unsafe-inline';">
-    <title>Career Roadmap Generator</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
-        }
-
-        .container {
-            max-width: 1000px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-            overflow: hidden;
-        }
-
-        .header {
-            background: linear-gradient(135deg, #2196F3, #21CBF3);
-            color: white;
-            padding: 30px;
-            text-align: center;
-        }
-
-        .form-section {
-            padding: 30px;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: #333;
-        }
-
-        input[type="text"], textarea, select {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            font-size: 16px;
-            transition: border-color 0.3s;
-        }
-
-        input[type="text"]:focus, textarea:focus, select:focus {
-            outline: none;
-            border-color: #2196F3;
-        }
-
-        textarea {
-            resize: vertical;
-            min-height: 80px;
-        }
-
-        .checkbox-group, .radio-group {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 15px;
-            margin-top: 10px;
-        }
-
-        .checkbox-item, .radio-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        button {
-            background: linear-gradient(135deg, #2196F3, #21CBF3);
-            color: white;
-            border: none;
-            padding: 15px 30px;
-            border-radius: 8px;
-            font-size: 18px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: transform 0.2s;
-            width: 100%;
-        }
-
-        button:hover {
-            transform: translateY(-2px);
-        }
-
-        .roadmap-output {
-            margin-top: 30px;
-            padding: 30px;
-            background: #f8f9fa;
-        }
-
-        .summary {
-            background: white;
-            padding: 25px;
-            border-radius: 10px;
-            margin-bottom: 25px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        }
-
-        .summary h2 {
-            color: #2196F3;
-            margin-bottom: 15px;
-            font-size: 24px;
-        }
-
-        .summary p {
-            margin-bottom: 10px;
-            line-height: 1.6;
-        }
-
-        .month-block {
-            background: white;
-            margin-bottom: 25px;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        }
-
-        .month-block h3 {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-            padding: 20px;
-            margin: 0;
-            font-size: 20px;
-        }
-
-        .month-focus {
-            background: #e3f2fd;
-            padding: 15px 20px;
-            font-style: italic;
-            color: #1976d2;
-            border-left: 4px solid #2196F3;
-        }
-
-        .week-block {
-            border-left: 4px solid #e0e0e0;
-            margin: 15px 20px;
-            padding-left: 20px;
-        }
-
-        .week-block h4 {
-            color: #333;
-            margin-bottom: 15px;
-            font-size: 18px;
-            padding: 10px 0;
-            border-bottom: 2px solid #f0f0f0;
-        }
-
-        .task-item {
-            margin-bottom: 15px;
-            padding: 15px;
-            background: #f8f9fa;
-            border-radius: 8px;
-            border-left: 4px solid #2196F3;
-        }
-
-        .task-item p {
-            margin-bottom: 8px;
-        }
-
-        .task-description {
-            color: #666;
-            font-size: 14px;
-            line-height: 1.5;
-        }
-
-        .loading {
-            text-align: center;
-            padding: 40px;
-            font-size: 18px;
-            color: #666;
-        }
-
-        .error {
-            background: #ffebee;
-            color: #c62828;
-            padding: 20px;
-            border-radius: 8px;
-            border-left: 4px solid #f44336;
-        }
-
-        @media (max-width: 768px) {
-            .container {
-                margin: 10px;
-                border-radius: 0;
-            }
-            
-            .checkbox-group, .radio-group {
-                flex-direction: column;
-            }
-        }
+        @import url('https://fonts.googleapis.com/css2?family=Allura&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
     </style>
+    <link rel="stylesheet" href="style.css">
+    <title>Roadmap</title>
 </head>
 <body>
     <div class="container">
-        <div class="header">
-            <h1>🚀 Career Roadmap Generator</h1>
-            <p>Generate your personalized learning path to success</p>
+        <div class="top">
+            <div class="headline">
+                <span>
+                    <h1 class="title">Your career Roadmap</h1>
+                    <p class="subheading">Personalized path to success</p>
+                </span>
+
+                <span class="timeline">
+                    <p class="timeline-p"><img src="Images/calendar.png" width="24px" height="24px" alt=""> Target Timeline</p>
+                    <h3 class="period">3 months</h3>
+                </span>
+            </div>
+
+            <div class="progress">
+                <div class="progress-info">
+                    <span>
+                        <h1>Goal: Product Designer</h1>
+                        <p>Month 1 of 3 • Keep going</p>
+                    </span>
+
+                    <span class="progress-percentage">
+                        <p>33%</p>
+                        <p>complete</p>
+                    </span>
+                </div>
+
+                <div class="progress-bar">
+                    <div class="filling"></div>
+                </div>
+            </div>
         </div>
 
-        <div class="form-section">
-            <form id="onboardingForm">
-                <div class="form-group">
-                    <label for="goal">Career Goal *</label>
-                    <input type="text" id="goal" name="goal" placeholder="e.g., Land my first job as a developer" required>
-                </div>
+        <div class="bottom">
+            <div class="timeline-line"></div>
+            <div class="monthly-roadmap">
+                <div class="month">
+                    <div class="spot"> 
+                        1
+                    </div>
 
-                <div class="form-group">
-                    <label for="target_role">Target Role</label>
-                    <input type="text" id="target_role" name="target_role" placeholder="e.g., Full Stack Developer">
+                    <span class="month-info"> 
+                        <h1>Month 1</h1>
+                        <p>Foundation & skills Building</p>
+                    </span>
                 </div>
-
-                <div class="form-group">
-                    <label for="why">Why is this important to you? *</label>
-                    <textarea id="why" name="why" placeholder="Share your motivation and what you hope to achieve..." required></textarea>
+                <div class="week-right">
+                    <div class="week-content">
+                        <h3> <span class="week-number">1</span> Week 1</h3>
+                        <p  class="week-focus">Design Fundamentals</p>
+                        <ul>
+                            <li>Complete design course</li>
+                            <li>Study colour theory and typography</li>
+                            <li>Practice basic composition rules</li>
+                            <li>Build a personal design project</li>
+                            <li>Join design communities online</li>
+                            <li>Create first mood board</li>
+                        </ul>
+                    </div>
+                    <div class="number"> <span class="number"><img width="45" src="Images/numberone.png" alt=""></span>
+                    </div>
+                    <div class="week-icon">
+                        <img width="300" src="Images/Hourglass.png" alt="">
+                    </div>
                 </div>
-
-                <div class="form-group">
-                    <label for="timeframe">Timeframe *</label>
-                    <select id="timeframe" name="timeframe" required>
-                        <option value="">Select timeframe</option>
-                        <option value="In 1 month">1 Month</option>
-                        <option value="In 3 months">3 Months</option>
-                        <option value="In 6 months">6 Months</option>
-                        <option value="In 1 year">1 Year</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label for="hours_per_week">Hours per week</label>
-                    <select id="hours_per_week" name="hours_per_week">
-                        <option value="5">5 hours</option>
-                        <option value="10" selected>10 hours</option>
-                        <option value="20">20 hours</option>
-                        <option value="40">40 hours (Full-time)</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label>Current Skills</label>
-                    <div class="checkbox-group">
-                        <div class="checkbox-item">
-                            <input type="checkbox" id="html" name="skills" value="HTML">
-                            <label for="html">HTML</label>
-                        </div>
-                        <div class="checkbox-item">
-                            <input type="checkbox" id="css" name="skills" value="CSS">
-                            <label for="css">CSS</label>
-                        </div>
-                        <div class="checkbox-item">
-                            <input type="checkbox" id="js" name="skills" value="JavaScript">
-                            <label for="js">JavaScript</label>
-                        </div>
-                        <div class="checkbox-item">
-                            <input type="checkbox" id="react" name="skills" value="React">
-                            <label for="react">React</label>
-                        </div>
-                        <div class="checkbox-item">
-                            <input type="checkbox" id="python" name="skills" value="Python">
-                            <label for="python">Python</label>
-                        </div>
+                
+                <div class="week-right">
+                    <div class="week-icon2">
+                        <img width="300" src="Images/paintpalette.png" alt="">
+                    </div>
+                    
+                    <div class="number2"> <span class="number">  <img width="45" src="Images/numbertwo.png" alt=""></span>
+                    </div>
+                    
+                    <div class="week-content2">
+                        <h3> <span class="week-number">1</span> Week 2</h3>
+                        <p  class="week-focus">Design Fundamentals</p>
+                        <ul>
+                            <li>Complete design course</li>
+                            <li>Study colour theory and typography</li>
+                            <li>Practice basic composition rules</li>
+                            <li>Build a personal design project</li>
+                            <li>Join design communities online</li>
+                            <li>Create first mood board</li>
+                        </ul>
                     </div>
                 </div>
 
-                <div class="form-group">
-                    <label>Learning Style</label>
-                    <div class="radio-group">
-                        <div class="radio-item">
-                            <input type="radio" id="visual" name="learning_style" value="visual" checked>
-                            <label for="visual">Visual</label>
-                        </div>
-                        <div class="radio-item">
-                            <input type="radio" id="hands-on" name="learning_style" value="hands-on">
-                            <label for="hands-on">Hands-on</label>
-                        </div>
-                        <div class="radio-item">
-                            <input type="radio" id="reading" name="learning_style" value="reading">
-                            <label for="reading">Reading</label>
-                        </div>
+                <div class="week-right">
+                    <div class="week-content">
+                        <h3> <span class="week-number">1</span> Week 3</h3>
+                        <p  class="week-focus">Design Fundamentals</p>
+                        <ul>
+                            <li>Complete design course</li>
+                            <li>Study colour theory and typography</li>
+                            <li>Practice basic composition rules</li>
+                            <li>Build a personal design project</li>
+                            <li>Join design communities online</li>
+                            <li>Create first mood board</li>
+                        </ul>
+                    </div>
+                    <div class="number"> <span class="number"><img width="45" src="Images/numberthree.png" alt=""></span>
+                    </div>
+                    <div class="week-icon">
+                        <img width="300" src="Images/Laptop (1).png" alt="">
+                    </div>
+                </div>
+                
+                <div class="week-right">
+                    <div class="week-icon2">
+                        <img width="300" src="Images/zip.png" alt="">
+                    </div>
+                    
+                    <div class="number2"> <span class="number">  <img width="45" src="Images/numberfour.png" alt=""></span>
+                    </div>
+                    
+                    <div class="week-content2">
+                        <h3> <span class="week-number">1</span> Week 4</h3>
+                        <p  class="week-focus">Design Fundamentals</p>
+                        <ul>
+                            <li>Complete design course</li>
+                            <li>Study colour theory and typography</li>
+                            <li>Practice basic composition rules</li>
+                            <li>Build a personal design project</li>
+                            <li>Join design communities online</li>
+                            <li>Create first mood board</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="month">
+                    <div class="spot"> 
+                        1
+                    </div>
+
+                    <span class="month-info"> 
+                        <h1>Month 2</h1>
+                        <p>Portfolio Development</p>
+                    </span>
+                </div>
+                <div class="week-right">
+                    <div class="week-content">
+                        <h3> <span class="week-number">1</span> Week 5</h3>
+                        <p  class="week-focus">Design Fundamentals</p>
+                        <ul>
+                            <li>Complete design course</li>
+                            <li>Study colour theory and typography</li>
+                            <li>Practice basic composition rules</li>
+                            <li>Build a personal design project</li>
+                            <li>Join design communities online</li>
+                            <li>Create first mood board</li>
+                        </ul>
+                    </div>
+                    <div class="number"> <span class="number"><img width="45" src="Images/numberone.png" alt=""></span>
+                    </div>
+                    <div class="week-icon">
+                        <img width="300" src="Images/presentation.png" alt="">
+                    </div>
+                </div>
+                
+                <div class="week-right">
+                    <div class="week-icon2">
+                        <img width="300" src="Images/clipboard.png" alt="">
+                    </div>
+                    
+                    <div class="number2"> <span class="number">  <img width="45" src="Images/numbertwo.png" alt=""></span>
+                    </div>
+                    
+                    <div class="week-content2">
+                        <h3> <span class="week-number">1</span> Week 6</h3>
+                        <p  class="week-focus">Design Fundamentals</p>
+                        <ul>
+                            <li>Complete design course</li>
+                            <li>Study colour theory and typography</li>
+                            <li>Practice basic composition rules</li>
+                            <li>Build a personal design project</li>
+                            <li>Join design communities online</li>
+                            <li>Create first mood board</li>
+                        </ul>
                     </div>
                 </div>
 
-                <button type="submit">Generate My Roadmap 🎯</button>
-            </form>
-        </div>
+                <div class="week-right">
+                    <div class="week-content">
+                        <h3> <span class="week-number">1</span> Week 7</h3>
+                        <p  class="week-focus">Design Fundamentals</p>
+                        <ul>
+                            <li>Complete design course</li>
+                            <li>Study colour theory and typography</li>
+                            <li>Practice basic composition rules</li>
+                            <li>Build a personal design project</li>
+                            <li>Join design communities online</li>
+                            <li>Create first mood board</li>
+                        </ul>
+                    </div>
+                    <div class="number"> <span class="number"><img width="45" src="Images/numberthree.png" alt=""></span>
+                    </div>
+                    <div class="week-icon">
+                        <img width="300" src="Images/refresh.png" alt="">
+                    </div>
+                </div>
+                
+                <div class="week-right">
+                    <div class="week-icon2">
+                        <img width="300" src="Images/target.png" alt="">
+                    </div>
+                    
+                    <div class="number2"> <span class="number">  <img width="45" src="Images/numberfour.png" alt=""></span>
+                    </div>
+                    
+                    <div class="week-content2">
+                        <h3> <span class="week-number">1</span> Week 8</h3>
+                        <p  class="week-focus">Design Fundamentals</p>
+                        <ul>
+                            <li>Complete design course</li>
+                            <li>Study colour theory and typography</li>
+                            <li>Practice basic composition rules</li>
+                            <li>Build a personal design project</li>
+                            <li>Join design communities online</li>
+                            <li>Create first mood board</li>
+                        </ul>
+                    </div>
+                </div>
 
-        <div id="roadmapOutput" class="roadmap-output" style="display: none;"></div>
+                <div class="month">
+                    <div class="spot"> 
+                        1
+                    </div>
+
+                    <span class="month-info"> 
+                        <h1>Month 3</h1>
+                        <p>Portfolio Development</p>
+                    </span>
+                </div>
+                <div class="week-right">
+                    <div class="week-content">
+                        <h3> <span class="week-number">1</span> Week 9</h3>
+                        <p  class="week-focus">Design Fundamentals</p>
+                        <ul>
+                            <li>Complete design course</li>
+                            <li>Study colour theory and typography</li>
+                            <li>Practice basic composition rules</li>
+                            <li>Build a personal design project</li>
+                            <li>Join design communities online</li>
+                            <li>Create first mood board</li>
+                        </ul>
+                    </div>
+                    <div class="number"> <span class="number"><img width="45" src="Images/numberone.png" alt=""></span>
+                    </div>
+                    <div class="week-icon">
+                        <img width="300" src="Images/balance.png" alt="">
+                    </div>
+                </div>
+                
+                <div class="week-right">
+                    <div class="week-icon2">
+                        <img width="300" src="Images/padlock.png" alt="">
+                    </div>
+                    
+                    <div class="number2"> <span class="number">  <img width="45" src="Images/numbertwo.png" alt=""></span>
+                    </div>
+                    
+                    <div class="week-content2">
+                        <h3> <span class="week-number">1</span> Week 10</h3>
+                        <p  class="week-focus">Design Fundamentals</p>
+                        <ul>
+                            <li>Complete design course</li>
+                            <li>Study colour theory and typography</li>
+                            <li>Practice basic composition rules</li>
+                            <li>Build a personal design project</li>
+                            <li>Join design communities online</li>
+                            <li>Create first mood board</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="week-right">
+                    <div class="week-content">
+                        <h3> <span class="week-number">1</span> Week 11</h3>
+                        <p  class="week-focus">Design Fundamentals</p>
+                        <ul>
+                            <li>Complete design course</li>
+                            <li>Study colour theory and typography</li>
+                            <li>Practice basic composition rules</li>
+                            <li>Build a personal design project</li>
+                            <li>Join design communities online</li>
+                            <li>Create first mood board</li>
+                        </ul>
+                    </div>
+                    <div class="number"> <span class="number"><img width="45" src="Images/numberthree.png" alt=""></span>
+                    </div>
+                    <div class="week-icon">
+                        <img width="300" src="Images/rocket.png" alt="">
+                    </div>
+                </div>
+                
+                <div class="week-right">
+                    <div class="week-icon2">
+                        <img width="300" src="Images/Calendar (1).png" alt="">
+                    </div>
+                    
+                    <div class="number2"> <span class="number">  <img width="45" src="Images/numberfour.png" alt=""></span>
+                    </div>
+                    
+                    <div class="week-content2">
+                        <h3> <span class="week-number">1</span> Week 12</h3>
+                        <p  class="week-focus">Design Fundamentals</p>
+                        <ul>
+                            <li>Complete design course</li>
+                            <li>Study colour theory and typography</li>
+                            <li>Practice basic composition rules</li>
+                            <li>Build a personal design project</li>
+                            <li>Join design communities online</li>
+                            <li>Create first mood board</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="footer">
+            <span>
+                <img src="Images/trophy.png" alt="">
+            </span>
+            <h3><span><img src="Images/Vector (1).png" alt=""></span> Roadmap Completed 🎉</h3>
+            <br>
+            <p>Congratulations on your journey to becoming a <br> <b>Product Designer</b></p>
+        </div>
     </div>
-
-    <script>
-        // Grab elements
-        const form = document.getElementById("onboardingForm");
-        const output = document.getElementById("roadmapOutput");
-
-        // Helper: sanitize text in HTML
-        function sanitize(str = "") {
-            const div = document.createElement("div");
-            div.textContent = str;
-            return div.innerHTML;
-        }
-
-        // Render the roadmap data into #roadmapOutput
-        function renderRoadmap({ goal, target_role, why, timeframe, roadmap }) {
-            console.log("🎨 Rendering roadmap:", { goal, target_role, why, timeframe, roadmap });
-            
-            output.style.display = 'block';
-            output.innerHTML = `
-                <div class="summary">
-                    <h2>Your Roadmap: "${sanitize(goal)}"</h2>
-                    ${target_role ? `<p><strong>Target Role:</strong> ${sanitize(target_role)}</p>` : ''}
-                    <p><strong>Why:</strong> ${sanitize(why)}</p>
-                    <p><strong>Timeline:</strong> ${sanitize(timeframe)}</p>
-                </div>
-                <div class="roadmap-container"></div>
-            `;
-
-            const container = output.querySelector(".roadmap-container");
-            
-            if (!roadmap || !Array.isArray(roadmap)) {
-                container.innerHTML = '<div class="error">No roadmap data available.</div>';
-                return;
-            }
-
-            roadmap.forEach((monthObj) => {
-                const monthDiv = document.createElement("div");
-                monthDiv.className = "month-block";
-                
-                monthDiv.innerHTML = `
-                    <h3>📅 Month ${sanitize(monthObj.month?.toString() || 'TBD')}</h3>
-                    ${monthObj.focus ? `<div class="month-focus">Focus: ${sanitize(monthObj.focus)}</div>` : ''}
-                `;
-                
-                if (monthObj.weeks && Array.isArray(monthObj.weeks)) {
-                    monthObj.weeks.forEach((weekObj) => {
-                        const weekDiv = document.createElement("div");
-                        weekDiv.className = "week-block";
-                        weekDiv.innerHTML = `<h4>Week ${sanitize(weekObj.week?.toString() || 'TBD')}</h4>`;
-                        
-                        (weekObj.tasks || []).forEach((task) => {
-                            const taskDiv = document.createElement("div");
-                            taskDiv.className = "task-item";
-                            taskDiv.innerHTML = `
-                                <p><strong>${sanitize(task.title)}</strong> 
-                                   ${task.estimated_time ? `<span style="color: #666;">(${sanitize(task.estimated_time)})</span>` : ''}
-                                </p>
-                                ${task.description ? `<p class="task-description">${sanitize(task.description)}</p>` : ''}
-                            `;
-                            weekDiv.appendChild(taskDiv);
-                        });
-                        monthDiv.appendChild(weekDiv);
-                    });
-                } else {
-                    monthDiv.innerHTML += '<div class="error">No weeks defined for this month.</div>';
-                }
-                
-                container.appendChild(monthDiv);
-            });
-        }
-
-        // Main form handler
-        form.addEventListener("submit", async (e) => {
-            e.preventDefault();
-            
-            output.style.display = 'block';
-            output.innerHTML = '<div class="loading">🔄 Generating your personalized roadmap...</div>';
-
-            const formData = new FormData(form);
-            const data = {
-                goal: formData.get("goal"),
-                target_role: formData.get("target_role"),
-                why: formData.get("why"),
-                timeframe: formData.get("timeframe"),
-                hours_per_week: formData.get("hours_per_week"),
-                learning_style: formData.get("learning_style"),
-                learning_speed: "average", // Default since not in form
-                skill_level: "beginner",   // Default since not in form
-                skills: formData.getAll("skills"),
-            };
-
-            console.log("📤 Sending request:", data);
-
-            // Validation
-            if (!data.goal || !data.why || !data.timeframe) {
-                output.innerHTML = '<div class="error">Please fill out all required fields.</div>';
-                return;
-            }
-
-            try {
-                const res = await fetch("http://127.0.0.1:8000/api/full_pipeline", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(data),
-                });
-
-                if (!res.ok) {
-                    const errorText = await res.text();
-                    console.error("❌ API Error:", errorText);
-                    output.innerHTML = `<div class="error">Error ${res.status}: ${res.statusText}</div>`;
-                    return;
-                }
-
-                const json = await res.json();
-                console.log("📥 Full Response:", json);
-                console.log("📥 Roadmap Data:", json.roadmap);
-                
-                if (json.roadmap) {
-                    renderRoadmap(json.roadmap);
-                } else {
-                    output.innerHTML = '<div class="error">No roadmap data received from server.</div>';
-                    console.error("❌ No roadmap in response:", json);
-                }
-            } catch (err) {
-                console.error("❌ Request failed:", err);
-                output.innerHTML = '<div class="error">Something went wrong. Please check your internet connection and try again.</div>';
-            }
-        });
-    </script>
 </body>
 </html>

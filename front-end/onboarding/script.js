@@ -97,4 +97,17 @@ document.addEventListener('DOMContentLoaded', function() {
             nextBtn.style.background = '#B9B9B9';
         }
     }
+
+    const finalStep = steps[steps.length - 1];
+    const finishBtn = finalStep.querySelector(".next-btn");
+
+    if (finishBtn) {
+      finishBtn.addEventListener("click", function (e) {
+        e.preventDefault();
+        alert("🎉 You're done! Generating your personalized roadmap...");
+        // You can also redirect or trigger another function here
+        // window.location.href = "/dashboard";
+      });
+    }
+
 });
