@@ -111,3 +111,11 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
 });
+
+const clickedButtons = document.querySelectorAll(".option-btn, .select-btn");
+
+clickedButtons.forEach(button => {
+    button.addEventListener("click", function() {
+        const selectedValue = this.getAttribute("data-value");
+    });
+});

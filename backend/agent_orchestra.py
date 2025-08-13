@@ -682,4 +682,4 @@ def api_full_pipeline(req: FullPipelineReq):
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("agent_orhcestra:app", host="127.0.0.1", port=8000, reload=True)
+    uvicorn.run("agent_orchestra:app", host="127.0.0.1", port=8000, reload=True)

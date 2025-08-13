@@ -17,8 +17,8 @@
 
         <div class="right">
             <img class="logo" src="Images/navipro.png" alt="Logo">
-            <h1>Create your account</h1>
-            <p class="cta">Smarter decisions for your next career move</p>
+            <h1>Hello, welcome back</h1>
+            <p class="cta">Let's pick up where you left off!</p>
             
             <div class="form-container">
                 <button class="google-register">
@@ -31,10 +31,7 @@
                 </div>
                 
                 <form>
-                    <div class="name-row">
-                        <input id="firstname" class="form-input" type="text" placeholder="First name" required>
-                        <input id="lastname" class="form-input" type="text" placeholder="Last name" required>
-                    </div>
+                    
                     <input id="email" class="form-input" type="email" placeholder="fullname@gmail.com" required>
 
                     <div class="password-container">
@@ -43,24 +40,18 @@
                             <span class="eye-open"></span>
                         </button>
                     </div>
-                    
-                    <!-- Confirm password field with toggle -->
-                    <div class="password-container">
-                        <input id="confirmpassword" class="form-input" type="password" placeholder="Confirm Password" minlength="8" required>
-                        <button type="button" class="password-toggle" onclick="togglePassword('confirmpassword', this)">
-                            <span class="eye-open"></span>
-                        </button>
-                    </div>
+
+                    <button class="submit" type="submit">Log in</button>
 
                     <div class="checkbox-container">
-                        <input type="checkbox" id="terms" required>
-                        <label for="terms">I agree to the <a href="#">Terms & Conditions</a></label>
+                        <span><input type="checkbox" id="terms" required>
+                        <label for="terms">Remember me</label></span>
+
+                        <a href="../Forgot Password/index.html">forgot password</a>
                     </div>
     
-                    <button class="submit" type="submit">Get started</button>
-    
                     <p class="login-link">
-                        Already have an account? <a href="../login/index.html">Log in</a>
+                        Don't have an account? <a href="../Create Account/index.html">Register</a>
                     </p>
                 </form>
                 

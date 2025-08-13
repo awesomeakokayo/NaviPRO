@@ -19,6 +19,7 @@ body{
     background: #1A4156;
     color: white;
     width: 25%;
+    overflow: hidden;
 }
 
 .logo{
@@ -92,8 +93,12 @@ body{
 .dashboard-layout{
     display: flex;
     flex-direction: column;
-    width: 75%;
+    width: 100%;
     height: 100vh;
+}
+
+.main-content {
+    width: 75%;
 }
 
 .icons{
@@ -267,6 +272,7 @@ body{
     margin: 0.5rem;
     display: flex;
     flex-direction: column;
+    align-items: flex-start;
     color: #737373;
     margin-bottom: 1.3rem;
     height: 229.91px;
@@ -282,11 +288,12 @@ body{
 .task-list{
     display: flex;
     flex-direction: column;
+    align-items: flex-start;
 }
 
 .task-lists{
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     font-size: smaller;
     padding-bottom: 5px;
 }
@@ -300,6 +307,7 @@ body{
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
+    width: 100%;
 }
 
 .active-task{
@@ -684,8 +692,16 @@ b{
         margin: 10px 0;
     }
 
-    .task-lists1 {
+    .task-list{
+        display: flex;
         flex-direction: column;
+        align-items: left;
+        justify-content: flex-start;
+        gap: 10px;
+    }
+
+    .task-lists1 {
+        flex-direction: row;
         gap: 10px;
     }
 

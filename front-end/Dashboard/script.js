@@ -1,3 +1,55 @@
+function loadPage(page) {
+  document.getElementById("mainFrame").src = page;
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+    const mainContent = document.getElementById("mainContent");
+
+    // Function to load pages
+    function loadPage(url) {
+        fetch(url)
+          .then((response) => {
+            if (!response.ok) throw new Error("Page not found: " + url);
+            return response.text();
+          })
+          .then((htmlText) => {
+            // Create a virtual DOM from the loaded HTML
+            let parser = new DOMParser();
+            let doc = parser.parseFromString(htmlText, "text/html");
+
+            // Find the mainContent in the loaded file
+            let newContent = doc.querySelector("#mainContent");
+
+            if (newContent) {
+              document.getElementById("mainContent").innerHTML =
+                newContent.innerHTML;
+            } else {
+              document.getElementById("mainContent").innerHTML =
+                "<p style='color:red;'>No #mainContent found in file.</p>";
+            }
+          })
+          .catch((error) => {
+            mainContent.innerHTML = `<p style="color:red;">Error loading page</p>`;
+            console.error(error);
+          });
+    }
+
+    // Assign click events to your nav buttons
+    document.querySelectorAll(".nav-button").forEach((btn, index) => {
+        btn.addEventListener("click", (e) => {
+            e.preventDefault();
+
+            if (index === 0) loadPage("../Dashboard/index.html");
+            if (index === 1) loadPage("../Career path/index.html");
+            if (index === 2) loadPage("../Career path/index.html");
+            if (index === 3) loadPage("../Resources/index.html");
+        });
+    });
+
+    // Load dashboard by default
+    loadPage("../Dashboard/index.html");
+});
+
 // Add this at the top of your file
 let progressChart = null;
 let momentumChart = null;
@@ -11,25 +63,26 @@ navButtons.forEach((btn) =>
   })
 );
 
-
 //  USER PROGRESS TRACKING
 
 /**
  * Get user's overall progress
  */
 async function getUserProgress() {
-    if (!currentUserId) {
-        console.error("No user ID available");
-        return null;
-    }
+  if (!currentUserId) {
+    console.error("No user ID available");
+    return null;
+  }
 
-    try {
-        const response = await fetch(`http://127.0.0.1:8000/api/user_progress/${currentUserId}`);
-        
-        if (response.ok) {
-            const progressData = await response.json();
-            return progressData;
-            /*
+  try {
+    const response = await fetch(
+      `http://127.0.0.1:8000/api/user_progress/${currentUserId}`
+    );
+
+    if (response.ok) {
+      const progressData = await response.json();
+      return progressData;
+      /*
             Returns:
             {
                 "goal": "Land my first job",
@@ -42,29 +95,29 @@ async function getUserProgress() {
                 "start_date": "2024-01-15T10:00:00"
             }
             */
-        } else {
-            console.error("Failed to get user progress");
-            return null;
-        }
-    } catch (error) {
-        console.error("Error fetching progress:", error);
-        return null;
+    } else {
+      console.error("Failed to get user progress");
+      return null;
     }
+  } catch (error) {
+    console.error("Error fetching progress:", error);
+    return null;
+  }
 }
 
 /**
  * Display user progress
  */
 async function displayUserProgress() {
-    const progress = await getUserProgress();
-    
-    if (!progress) {
-        document.getElementById('progressContainer').innerHTML = 
-            '<p>Progress data not available.</p>';
-        return;
-    }
+  const progress = await getUserProgress();
 
-    document.getElementById('progressContainer').innerHTML = `
+  if (!progress) {
+    document.getElementById("progressContainer").innerHTML =
+      "<p>Progress data not available.</p>";
+    return;
+  }
+
+  document.getElementById("progressContainer").innerHTML = `
         <div class="progress-section">
             <h3>📊 Your Learning Progress</h3>
             <p><strong>Goal:</strong> ${progress.goal}</p>
@@ -85,169 +138,188 @@ async function displayUserProgress() {
             </div>
             
             <div class="progress-bar">
-                <div class="progress-fill" style="width: ${progress.completion_percentage}%"></div>
+                <div class="progress-fill" style="width: ${
+                  progress.completion_percentage
+                }%"></div>
             </div>
             
             <div class="current-position">
-                <p><strong>Current Position:</strong> Month ${progress.current_month}, Week ${progress.current_week}, Day ${progress.current_day}</p>
-                <p><strong>Started:</strong> ${new Date(progress.start_date).toLocaleDateString()}</p>
+                <p><strong>Current Position:</strong> Month ${
+                  progress.current_month
+                }, Week ${progress.current_week}, Day ${
+    progress.current_day
+  }</p>
+                <p><strong>Started:</strong> ${new Date(
+                  progress.start_date
+                ).toLocaleDateString()}</p>
             </div>
         </div>
     `;
 }
 
 async function initCharts() {
-    console.log("Initializing charts...");
+  console.log("Initializing charts...");
 
-    const progressCanvas = document.getElementById("progressChart");
-    const momentumCanvas = document.getElementById("momentumChart");
+  const progressCanvas = document.getElementById("progressChart");
+  const momentumCanvas = document.getElementById("momentumChart");
 
-    if (!progressCanvas || !momentumCanvas) {
-        console.error("Canvas elements not found!", {
-            progressCanvas: !!progressCanvas,
-            momentumCanvas: !!momentumCanvas
-        });
-        return;
-    }
-
-    // Set default values
-    const chartData = {
-        completedTasks: 8,
-        inProgressTasks: 12,
-        upcomingTasks: 20
-    };
-
-    // Clean up existing charts
-    if (progressChart) progressChart.destroy();
-    if (momentumChart) momentumChart.destroy();
-
-    // Initialize progress chart with center text
-    progressChart = new Chart(progressCanvas.getContext('2d'), {
-        type: "doughnut",
-        data: {
-            datasets: [{
-                data: [chartData.completedTasks, chartData.inProgressTasks, chartData.upcomingTasks],
-                backgroundColor: ["#2ecc71", "#264653", "#b0b0b0"],
-                cutout: "75%",
-                borderWidth: 0,
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                tooltip: { enabled: false },
-                legend: { display: false }
-            }
-        },
-        plugins: [{
-            id: 'centerText',
-            beforeDraw: function(chart) {
-                const width = chart.width;
-                const height = chart.height;
-                const ctx = chart.ctx;
-                
-                ctx.restore();
-                
-                // Calculate percentage
-                const total = chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
-                const completed = chart.data.datasets[0].data[0];
-                const percentage = Math.round((completed / total) * 100);
-                
-                // Font size relative to chart size
-                const fontSize = (height / 8).toFixed(2);
-                ctx.font = `bold ${fontSize}px Poppins`;
-                ctx.textBaseline = 'middle';
-                ctx.textAlign = 'center';
-                
-                // Draw percentage
-                const text = `${percentage}%`;
-                const textX = width / 2;
-                const textY = height / 2;
-                
-                ctx.fillStyle = '#1B455B';
-                ctx.fillText(text, textX, textY);
-                
-                ctx.save();
-            }
-        }]
+  if (!progressCanvas || !momentumCanvas) {
+    console.error("Canvas elements not found!", {
+      progressCanvas: !!progressCanvas,
+      momentumCanvas: !!momentumCanvas,
     });
+    return;
+  }
 
-    // Initialize momentum chart
-    momentumChart = new Chart(momentumCanvas.getContext("2d"), {
-        type: "bar",
-        data: {
-            labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
-            datasets: [
-                {
-                    label: "Completed work",
-                    data: [4.5, 6.5, 2.5, 5, 3, 0, 0],
-                    backgroundColor: "#264653",
-                    stack: "a",
-                    barThickness: 30,
-                },
-                {
-                    label: "Proposed effort",
-                    data: [1.5, 2, 1, 2, 2, 7, 6],
-                    backgroundColor: "#f4a261",
-                    stack: "a",
-                    borderRadius: { topLeft: 5, topRight: 5 },
-                    barThickness: 30,
-                },
-            ],
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: { 
-                legend: { 
-                    display: false 
-                }
-            },
-            scales: {
-                x: { 
-                    stacked: true,
-                    grid: {
-                        display: false
-                    },
-                    ticks: {
-                        font: {
-                            size: 14,
-                            family: 'Poppins'
-                        },
-                        color: '#666'
-                    }
-                },
-                y: {
-                    stacked: true,
-                    beginAtZero: true,
-                    max: 8,
-                    ticks: { 
-                        stepSize: 2,
-                        font: {
-                            size: 20,
-                            family: 'Poppins'
-                        },
-                        color: '#666',
-                        padding: 10
-                    },
-                    grid: {
-                        color: '#f0f0f0'
-                    }
-                },
-            },
-            layout: {
-                padding: {
-                    top: 10,
-                    right: 25,
-                    bottom: 10,
-                    left: 10
-                }
-            }
-        },
-    });
+  // Set default values
+  const chartData = {
+    completedTasks: 8,
+    inProgressTasks: 12,
+    upcomingTasks: 20,
+  };
 
-    console.log("Charts initialized successfully");
+  // Clean up existing charts
+  if (progressChart) progressChart.destroy();
+  if (momentumChart) momentumChart.destroy();
+
+  // Initialize progress chart with center text
+  progressChart = new Chart(progressCanvas.getContext("2d"), {
+    type: "doughnut",
+    data: {
+      datasets: [
+        {
+          data: [
+            chartData.completedTasks,
+            chartData.inProgressTasks,
+            chartData.upcomingTasks,
+          ],
+          backgroundColor: ["#2ecc71", "#264653", "#b0b0b0"],
+          cutout: "75%",
+          borderWidth: 0,
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        tooltip: { enabled: false },
+        legend: { display: false },
+      },
+    },
+    plugins: [
+      {
+        id: "centerText",
+        beforeDraw: function (chart) {
+          const width = chart.width;
+          const height = chart.height;
+          const ctx = chart.ctx;
+
+          ctx.restore();
+
+          // Calculate percentage
+          const total = chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
+          const completed = chart.data.datasets[0].data[0];
+          const percentage = Math.round((completed / total) * 100);
+
+          // Font size relative to chart size
+          const fontSize = (height / 8).toFixed(2);
+          ctx.font = `bold ${fontSize}px Poppins`;
+          ctx.textBaseline = "middle";
+          ctx.textAlign = "center";
+
+          // Draw percentage
+          const text = `${percentage}%`;
+          const textX = width / 2;
+          const textY = height / 2;
+
+          ctx.fillStyle = "#1B455B";
+          ctx.fillText(text, textX, textY);
+
+          ctx.save();
+        },
+      },
+    ],
+  });
+
+  // Initialize momentum chart
+  momentumChart = new Chart(momentumCanvas.getContext("2d"), {
+    type: "bar",
+    data: {
+      labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+      datasets: [
+        {
+          label: "Completed work",
+          data: [4.5, 6.5, 2.5, 5, 3, 0, 0],
+          backgroundColor: "#264653",
+          stack: "a",
+          barThickness: 30,
+        },
+        {
+          label: "Proposed effort",
+          data: [1.5, 2, 1, 2, 2, 7, 6],
+          backgroundColor: "#f4a261",
+          stack: "a",
+          borderRadius: { topLeft: 5, topRight: 5 },
+          barThickness: 30,
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          display: false,
+        },
+      },
+      scales: {
+        x: {
+          stacked: true,
+          grid: {
+            display: false,
+          },
+          ticks: {
+            font: {
+              padding: 8,
+              size: 14,
+              family: "Poppins",
+            },
+            color: "#666",
+          },
+        },
+        y: {
+          stacked: true,
+          beginAtZero: true,
+          max: 8,
+          ticks: {
+            stepSize: 2,
+            font: {
+              size: 15,
+              family: "Poppins",
+            },
+            color: "#666",
+            padding: 10,
+          },
+          grid: {
+            color: "#f0f0f0",
+          },
+        },
+      },
+      layout: {
+        padding: {
+          top: 10,
+          right: 15,
+          bottom: 10,
+          left: 5,
+        },
+      },
+      responsive: true,
+      responsiveAnimationDuration: 0,
+    },
+  });
+
+  console.log("Charts initialized successfully");
 }
 
 // DAILY TASK SYSTEM
@@ -256,14 +328,15 @@ async function initCharts() {
  * Get today's task for user
  */
 async function getTodaysTask() {
-
   if (!currentUserId) {
     console.error("No user ID available");
     return null;
   }
 
   try {
-    const response = await fetch(`http://127.0.0.1:8000/api/daily_task/${currentUserId}`);
+    const response = await fetch(
+      `http://127.0.0.1:8000/api/daily_task/${currentUserId}`
+    );
 
     if (response.ok) {
       const taskData = await response.json();
@@ -287,7 +360,7 @@ async function getTodaysTask() {
                 }
             }
             */
-    }  else {
+    } else {
       console.error("Failed to get today's task");
       return null;
     }
@@ -297,16 +370,15 @@ async function getTodaysTask() {
   }
 }
 
-
 /**
- * Display today's task 
+ * Display today's task
  */
 async function diaplayTodaysTask() {
   const task = await getTodaysTask();
 
   if (!task) {
-    document.getElementById('taskContainer').innerHTML = 
-    '<p>No task available or all tasks completed! 🎉</p>';
+    document.getElementById("taskContainer").innerHTML =
+      "<p>No task available or all tasks completed! 🎉</p>";
     return;
   }
 
@@ -359,15 +431,18 @@ async function completeTask() {
   }
 
   try {
-    const response = await fetch(`http://127.0.0.1:8000/api/complete_task/${currentUserId}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        "task_completed": true
-      })
-    });
+    const response = await fetch(
+      `http://127.0.0.1:8000/api/complete_task/${currentUserId}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          task_completed: true,
+        }),
+      }
+    );
     if (response.ok) {
       const result = await response.json();
       /**
@@ -405,7 +480,9 @@ async function getWeeklyVideos() {
   }
 
   try {
-    const response = await fetch(`http://127.0.0.1:8000/api/week_videos/${currentUserId}`);
+    const response = await fetch(
+      `http://127.0.0.1:8000/api/week_videos/${currentUserId}`
+    );
 
     if (response.ok) {
       const videoData = await response.json();
@@ -446,8 +523,8 @@ async function displayWeeklyVideos() {
   const videoData = await getWeeklyVideos();
 
   if (!videoData) {
-    document.getElementById('videoContainer').innerHTML =
-    '<p>No videos available at the moment.</P>';
+    document.getElementById("videoContainer").innerHTML =
+      "<p>No videos available at the moment.</P>";
     return;
   }
 
@@ -470,17 +547,21 @@ async function displayWeeklyVideos() {
       return `>1h`;
     } else {
       return `${hours}h`;
+    }
   }
-}
 
-// Display videos in UI
+  // Display videos in UI
   document.getElementById("videoContainer").innerHTML = `
     <div id="videoContainer" class="recommendations">
       <span class="video-content">
-        ${videoData.videos.map(video => `
+        ${videoData.videos
+          .map(
+            (video) => `
           <span><a href="${
             video.url
-          }"><img class="video-cover" width="80" height="50" src="${video.thumbnail}" alt=""></a></span>
+          }"><img class="video-cover" width="80" height="50" src="${
+              video.thumbnail
+            }" alt=""></a></span>
         <span class="video-about">
           <span class="video-title">
               <a class="video-title" href="${video.url}">${video.title}</a>
@@ -517,7 +598,8 @@ async function displayWeeklyVideos() {
  * Refresh weekly videos (useful if user wants new recommendations)
  */
 async function refreshWeeklyVideos() {
-  document.getElementById('videoContainer').innerHTML = '<p>Loading fresh video recommendations</p>';
+  document.getElementById("videoContainer").innerHTML =
+    "<p>Loading fresh video recommendations</p>";
   await displayWeeklyVideos();
 }
 
@@ -530,92 +612,93 @@ function refreshChart() {
 
 // Add this function to update the milestone and summary boxes
 async function updateProgressSection() {
-    const progress = await getUserProgress();
-    if (!progress) {
-        console.error("Could not fetch progress data");
-        return;
+  const progress = await getUserProgress();
+  if (!progress) {
+    console.error("Could not fetch progress data");
+    return;
+  }
+
+  try {
+    // Update completed tasks
+    const completedTasksElement = document.querySelector(".completed-tasks");
+    if (completedTasksElement) {
+      completedTasksElement.textContent = progress.completed_tasks;
     }
 
-    try {
-        // Update completed tasks
-        const completedTasksElement = document.querySelector('.completed-tasks');
-        if (completedTasksElement) {
-            completedTasksElement.textContent = progress.completed_tasks;
-        }
-
-        // Calculate and update in-progress tasks
-        const inProgressElement = document.querySelector('.in-progress-tasks');
-        if (inProgressElement) {
-            const weeklyTasks = 5;
-            const inProgressTasks = weeklyTasks - (progress.completed_tasks % weeklyTasks);
-            inProgressElement.textContent = inProgressTasks;
-        }
-
-        // Calculate and update upcoming tasks
-        const upcomingElement = document.querySelector('.upcoming-tasks');
-        if (upcomingElement) {
-            const upcomingTasks = progress.total_tasks - progress.completed_tasks;
-            upcomingElement.textContent = upcomingTasks;
-        }
-    } catch (error) {
-        console.error("Error updating progress section:", error);
+    // Calculate and update in-progress tasks
+    const inProgressElement = document.querySelector(".in-progress-tasks");
+    if (inProgressElement) {
+      const weeklyTasks = 5;
+      const inProgressTasks =
+        weeklyTasks - (progress.completed_tasks % weeklyTasks);
+      inProgressElement.textContent = inProgressTasks;
     }
+
+    // Calculate and update upcoming tasks
+    const upcomingElement = document.querySelector(".upcoming-tasks");
+    if (upcomingElement) {
+      const upcomingTasks = progress.total_tasks - progress.completed_tasks;
+      upcomingElement.textContent = upcomingTasks;
+    }
+  } catch (error) {
+    console.error("Error updating progress section:", error);
+  }
 }
 
 // Modify the window.addEventListener to include the new function
 window.addEventListener("DOMContentLoaded", () => {
-    initCharts();
-    loadDailyTask().catch(showError);
-    loadCourses();
-    updateProgressSection(); // Add this line
+  initCharts();
+  loadDailyTask().catch(showError);
+  loadCourses();
+  updateProgressSection(); // Add this line
 });
 
 // Add refresh function for periodic updates
 function refreshProgressSection() {
-    updateProgressSection();
+  updateProgressSection();
 }
 
 // Optional: Refresh every 5 minutes
 setInterval(refreshProgressSection, 300000);
 
 // Add at the end of your existing JavaScript
-document.addEventListener('DOMContentLoaded', function() {
-    const menuToggle = document.getElementById('menuToggle');
-    const navigation = document.getElementById('navigation');
-    
-    menuToggle.addEventListener('click', function() {
-        navigation.classList.toggle('active');
-        menuToggle.classList.toggle('active');
-    });
+document.addEventListener("DOMContentLoaded", function () {
+  const menuToggle = document.getElementById("menuToggle");
+  const navigation = document.getElementById("navigation");
 
-    // Close menu when clicking outside
-    document.addEventListener('click', function(e) {
-        if (!navigation.contains(e.target) && !menuToggle.contains(e.target)) {
-            navigation.classList.remove('active');
-            menuToggle.classList.remove('active');
-        }
-    });
+  menuToggle.addEventListener("click", function () {
+    navigation.classList.toggle("active");
+    menuToggle.classList.toggle("active");
+  });
 
-    // Adjust charts on window resize
-    window.addEventListener('resize', function() {
-        if (window.innerWidth <= 768) {
-            if (momentumChart) {
-                momentumChart.options.maintainAspectRatio = false;
-                momentumChart.update();
-            }
-            if (progressChart) {
-                progressChart.options.maintainAspectRatio = false;
-                progressChart.update();
-            }
-        } else {
-            if (momentumChart) {
-                momentumChart.options.maintainAspectRatio = true;
-                momentumChart.update();
-            }
-            if (progressChart) {
-                progressChart.options.maintainAspectRatio = true;
-                progressChart.update();
-            }
-        }
-    });
+  // Close menu when clicking outside
+  document.addEventListener("click", function (e) {
+    if (!navigation.contains(e.target) && !menuToggle.contains(e.target)) {
+      navigation.classList.remove("active");
+      menuToggle.classList.remove("active");
+    }
+  });
+
+  // Adjust charts on window resize
+  window.addEventListener("resize", function () {
+    if (window.innerWidth <= 768) {
+      if (momentumChart) {
+        momentumChart.options.maintainAspectRatio = false;
+        momentumChart.update();
+      }
+      if (progressChart) {
+        progressChart.options.maintainAspectRatio = false;
+        progressChart.update();
+      }
+    } else {
+      if (momentumChart) {
+        momentumChart.options.maintainAspectRatio = true;
+        momentumChart.update();
+      }
+      if (progressChart) {
+        progressChart.options.maintainAspectRatio = true;
+        progressChart.update();
+      }
+    }
+  });
 });
