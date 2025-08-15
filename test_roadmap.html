@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Roadmap Generation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            background: #FF9E00;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #e68a00;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background: #f9f9f9;
+        }
+        .error {
+            border-color: #ff6b6b;
+            background: #ffe6e6;
+        }
+    </style>
+</head>
+<body>
+    <h1>Test Roadmap Generation</h1>
+    
+    <form id="roadmapForm">
+        <div class="form-group">
+            <label for="goal">Goal:</label>
+            <input type="text" id="goal" value="Product Designer" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="target_role">Target Role:</label>
+            <input type="text" id="target_role" value="Product Designer" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="timeframe">Timeframe:</label>
+            <select id="timeframe" required>
+                <option value="3_months">3 months</option>
+                <option value="6_months">6 months</option>
+                <option value="1_year">1 year</option>
+                <option value="not_sure">Not sure</option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="hours_per_week">Hours per Week:</label>
+            <select id="hours_per_week" required>
+                <option value="1_to_3_hours">1-3 hours</option>
+                <option value="4_to_6_hours">4-6 hours</option>
+                <option value="7_to_10_hours">7-10 hours</option>
+                <option value="10+_hours">10+ hours</option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="learning_style">Learning Style:</label>
+            <select id="learning_style" required>
+                <option value="watching_videos">Watching videos</option>
+                <option value="reading_articles">Reading articles</option>
+                <option value="doing_projects">Doing projects</option>
+                <option value="mix_of_everything">Mix of everything</option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="learning_speed">Learning Speed:</label>
+            <select id="learning_speed" required>
+                <option value="slow">Slow</option>
+                <option value="average">Average</option>
+                <option value="fast">Fast</option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="skill_level">Skill Level:</label>
+            <select id="skill_level" required>
+                <option value="beginner">Beginner</option>
+                <option value="intermediate">Intermediate</option>
+                <option value="advanced">Advanced</option>
+            </select>
+        </div>
+        
+        <button type="submit">Generate Roadmap</button>
+    </form>
+    
+    <div id="result" class="result" style="display: none;"></div>
+    
+    <script>
+        document.getElementById('roadmapForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = {
+                goal: document.getElementById('goal').value,
+                target_role: document.getElementById('target_role').value,
+                timeframe: document.getElementById('timeframe').value,
+                hours_per_week: document.getElementById('hours_per_week').value,
+                learning_style: document.getElementById('learning_style').value,
+                learning_speed: document.getElementById('learning_speed').value,
+                skill_level: document.getElementById('skill_level').value
+            };
+            
+            const resultDiv = document.getElementById('result');
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = 'Generating roadmap...';
+            resultDiv.className = 'result';
+            
+            try {
+                const response = await fetch('http://127.0.0.1:8000/api/generate_roadmap', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData),
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    resultDiv.innerHTML = `
+                        <h3>✅ Roadmap Generated Successfully!</h3>
+                        <p><strong>User ID:</strong> ${data.user_id}</p>
+                        <p><strong>Goal:</strong> ${data.roadmap.goal}</p>
+                        <p><strong>Target Role:</strong> ${data.roadmap.target_role}</p>
+                        <p><strong>Timeframe:</strong> ${data.roadmap.timeframe}</p>
+                        <p><strong>Total Months:</strong> ${data.roadmap.roadmap.length}</p>
+                        <p><strong>Total Tasks:</strong> ${calculateTotalTasks(data.roadmap)}</p>
+                        <button onclick="viewRoadmap('${data.user_id}')">View Full Roadmap</button>
+                    `;
+                    resultDiv.className = 'result';
+                } else {
+                    throw new Error(data.message || 'Failed to generate roadmap');
+                }
+                
+            } catch (error) {
+                console.error('Error:', error);
+                resultDiv.innerHTML = `
+                    <h3>❌ Error Generating Roadmap</h3>
+                    <p><strong>Error:</strong> ${error.message}</p>
+                    <p>Make sure the backend server is running on http://127.0.0.1:8000</p>
+                `;
+                resultDiv.className = 'result error';
+            }
+        });
+        
+        function calculateTotalTasks(roadmap) {
+            let total = 0;
+            roadmap.roadmap.forEach(month => {
+                month.weeks.forEach(week => {
+                    total += week.daily_tasks.length;
+                });
+            });
+            return total;
+        }
+        
+        function viewRoadmap(userId) {
+            // Store data and redirect to Career path page
+            fetch(`http://127.0.0.1:8000/api/user_progress/${userId}`)
+                .then(response => response.json())
+                .then(data => {
+                    console.log('User progress:', data);
+                    // You can redirect to the Career path page here
+                    // window.location.href = 'front-end/Career path/index.html';
+                })
+                .catch(error => {
+                    console.error('Error fetching user progress:', error);
+                });
+        }
+    </script>
+</body>
+</html> 

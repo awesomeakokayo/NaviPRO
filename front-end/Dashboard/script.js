@@ -2,7 +2,61 @@ function loadPage(page) {
   document.getElementById("mainFrame").src = page;
 }
 
+// Global user ID management
+let currentUserId = null;
+
+// Initialize user session
+function initializeUserSession() {
+    const userId = localStorage.getItem('userId');
+    const roadmapData = localStorage.getItem('roadmapData');
+    
+    if (!userId || !roadmapData) {
+        console.log('No user session found, redirecting to onboarding...');
+        window.location.href = '../onboarding/index.html';
+        return false;
+    }
+    
+    currentUserId = userId;
+    console.log('User session initialized:', currentUserId);
+    
+    // After roadmap generation, automatically load career path
+    if (localStorage.getItem('newRoadmapGenerated') === 'true') {
+        console.log('New roadmap detected, loading career path...');
+        loadSectionContent('career-path');
+        localStorage.removeItem('newRoadmapGenerated'); // Clear the flag
+        
+        // Highlight the career path nav button
+        document.querySelectorAll(".nav-button").forEach((btn, index) => {
+            btn.classList.remove("active");
+            if (index === 2) { // Career path button index
+                btn.classList.add("active");
+            }
+        });
+        return true;
+    }
+    
+    return true;
+}
+
+// Update welcome message with user's goal
+function updateWelcomeMessage(roadmap) {
+    const welcomeElement = document.querySelector('.welcome-user h2');
+    if (welcomeElement && roadmap.goal) {
+        welcomeElement.textContent = `Stay focused on your core mission - ${roadmap.goal}`;
+    }
+    
+    const nameElement = document.querySelector('.welcome-user .name');
+    if (nameElement) {
+        nameElement.textContent = `Welcome to your ${roadmap.target_role || 'Career'} Journey`;
+    }
+}
+
 document.addEventListener("DOMContentLoaded", function () {
+    // Initialize user session first
+    if (!initializeUserSession()) {
+        return;
+    }
+    
     const mainContent = document.getElementById("mainContent");
 
     // Function to load pages
@@ -34,20 +88,283 @@ document.addEventListener("DOMContentLoaded", function () {
           });
     }
 
+        // Content loading system for different sections
+    function loadSectionContent(sectionName) {
+        const mainContent = document.getElementById("mainContent");
+        
+        // Show loading indicator
+        mainContent.innerHTML = '<div style="text-align: center; padding: 50px;"><h3>Loading...</h3></div>';
+        
+        // Load content based on section
+        switch(sectionName) {
+            case 'dashboard':
+                loadDashboardContent();
+                break;
+            case 'tasks':
+                loadTasksContent();
+                break;
+            case 'career-path':
+                loadCareerPathContent();
+                break;
+            case 'resources':
+                loadResourcesContent();
+                break;
+            case 'navi':
+                loadNaviContent();
+                break;
+            default:
+                loadDashboardContent();
+        }
+    }
+    
+    // Load dashboard content (default view)
+    function loadDashboardContent() {
+        const mainContent = document.getElementById("mainContent");
+        mainContent.innerHTML = `
+            <div class="dashboard-layout">
+                <div class="icons">
+                    <div class="icons-left">
+                        <img width="20" height="20" src="https://img.icons8.com/fluency-systems-regular/48/1A1A1A/dashboard-layout.png" alt="dashboard-layout"/> <span>Dashboard</span>
+                    </div>
+                    <div class="icons-left"> 
+                        <img class="left-icon" width="27" height="27" src="https://img.icons8.com/?size=100&id=59878&format=png&color=1A1A1A" alt="">
+                        <img class="left-icon" width="27" height="27" src="https://img.icons8.com/?size=100&id=kGXPXvA8Atz6&format=png&color=737373" alt="notification">
+                        <img width="30" height="30" class="profile" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSzy13J-IV2y1EcJeCV2lWYml38i4JHyyXQ2g&s" alt="profile">
+                    </div>
+                </div>
+                <div class="content">
+                    <div class="welcome">
+                        <div class="welcome-user">
+                            <p class="name">Welcome to your Career Journey</p>
+                            <h2>Stay focused on your core mission</h2>
+                        </div>
+                        <div>
+                            <button class="talk-to-navi" onclick="loadSectionContent('Navi')">Talk to Navi</button>
+                        </div>
+                    </div>
+                    <div class="progress-section">
+                        <div class="left-progress-section">
+                            <div class="tracker-card">
+                                <div class="header"> <span class="label"><img width="30" height="30" src="Images/chart.png" alt="">Momentum tracker</span> <span class="time" >Daily</span></div>
+                                <div class="custom-legend">
+                                    <div class="legend-item">
+                                        <div class="legend-dot" style="background-color: #264653;"></div>
+                                        Completed work
+                                    </div>
+                                    <div class="legend-item">
+                                        <div class="legend-dot" style="background-color: #f4a261;"></div>
+                                        Proposed effort
+                                    </div>
+                                </div>
+                                <canvas id="momentumChart" width="250" height="150"></canvas>
+                                <div class="navi-box">
+                                    <img src="Images/Frame 3.png" class="navi-icon" alt="Navi Icon">
+                                    <div class="navi-text"><span>Navi:</span> We planned 5hrs today and only did 3. Shall we try reviewing your task load?</div>
+                                </div>
+                            </div>
+                            <div id="taskContainer" class="task">
+                                <!-- Task content will be loaded dynamically -->
+                            </div>
+                            <div class="skill">
+                                <div class="skill-header">
+                                    <span class="skill-header-left">
+                                        <img width="25" height="25" src="Images/fatrows (1).png" alt=""> Skill Momentum
+                                    </span>
+                                </div>
+                                <div class="middle">
+                                    <p>This weeks skill focus: </p>
+                                    <p>  • Wireframing</p>
+                                    <p>  • Visual hierarchy</p>
+                                    <p>  • Interaction Patterns</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="right-progress-section">
+                            <div class="progress-card">
+                                <div class="title">
+                                    <img width="24" height="24" src="Images/chart1.png" />
+                                    <span class="title1">Your overall progress</span>
+                                </div>
+                                <div class="progress-section1">
+                                    <div class="doughnut">
+                                        <canvas id="progressChart" width="200" height="200"></canvas>
+                                    </div>
+                                    <div class="milestone">
+                                        <a href="#" class="milestone-title"><img width="23" height="23" src="Images/next.png" alt="">Next Milestone</a>
+                                        <div class="milestone-sub">Design Systems</div>
+                                        <a class="advance-button1" href="#"> <button class="advance-button">Advance →</button></a>
+                                        <div class="streak">🔥 5 - day streak</div>
+                                    </div>
+                                </div>
+                                <div class="summary">
+                                    <div class="summary-box">
+                                        <img class="second-icon" width="25" height="25" src="https://img.icons8.com/?size=100&id=11751&format=png&color=FFFFFF" alt="">
+                                        <h3 class="completed-tasks">8</h3>
+                                        <p>Completed</p>
+                                    </div>
+                                    <div class="summary-box1">
+                                        <img class="middle-icon" height="25" width="25" src="https://img.icons8.com/?size=100&id=82767&format=png&color=FFFFFF" alt="">
+                                        <h3 class="in-progress-tasks">12</h3>
+                                        <p>In progress</p>
+                                    </div>
+                                    <div class="summary-box">
+                                        <img class="last-icon" width="27" height="27" src="https://img.icons8.com/?size=100&id=59878&format=png&color=FFFFFF" alt="">
+                                        <h3 class="upcoming-tasks">20</h3>
+                                        <p>Upcoming</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="video-recommendation">
+                                <div class="video-recommendation-header">
+                                    <span class="video-recommendation-left">
+                                        <img width="25" height="25" src="https://img.icons8.com/?size=100&id=LVtMPps1ASuP&format=png&color=737373" alt=""> Suggested for you
+                                    </span>
+                                </div>
+                                <div id="videoContainer" class="recommendations">
+                                    <!-- Video content will be loaded dynamically -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        // Initialize dashboard features
+        initCharts();
+        displayTodaysTask();
+        displayWeeklyVideos();
+        updateProgressSection();
+    }
+    
+    // Load tasks content
+    function loadTasksContent() {
+        const mainContent = document.getElementById("mainContent");
+        mainContent.innerHTML = `
+            <div class="section-header">
+                <h2>My Tasks</h2>
+                <p>Manage and track your learning tasks</p>
+            </div>
+            <div class="tasks-content">
+                <iframe src="../Task Generator/index.html" width="100%" height="800px" frameborder="0" 
+                        onload="console.log('Tasks loaded successfully')" 
+                        onerror="handleIframeError('tasks')"></iframe>
+                <div id="tasks-fallback" style="display: none; text-align: center; padding: 50px;">
+                    <h3>Tasks Section</h3>
+                    <p>Unable to load Task Generator. <a href="../Task Generator/index.html" target="_blank">Open in new tab</a></p>
+                </div>
+            </div>
+        `;
+    }
+    
+    // Load career path content
+    function loadCareerPathContent() {
+        const mainContent = document.getElementById("mainContent");
+        const roadmapData = localStorage.getItem('roadmapData');
+        
+        if (!roadmapData) {
+            console.error('No roadmap data found');
+            return;
+        }
+
+        try {
+            const roadmap = JSON.parse(roadmapData);
+            mainContent.innerHTML = `
+                <div class="career-path-container">
+                    <iframe src="../Career path/index.html" 
+                            width="100%" 
+                            height="800px" 
+                            frameborder="0"
+                            onload="initializeRoadmap(${JSON.stringify(roadmap)})"
+                            onerror="handleIframeError('career-path')">
+                    </iframe>
+                </div>
+            `;
+        } catch (error) {
+            console.error('Error loading roadmap:', error);
+        }
+    }
+    
+    // Load resources content
+    function loadResourcesContent() {
+        const mainContent = document.getElementById("mainContent");
+        mainContent.innerHTML = `
+            <div class="section-header">
+                <h2>Learning Resources</h2>
+                <p>Discover courses and materials for your journey</p>
+            </div>
+            <div class="resources-content">
+                <iframe src="../Course Recommendation/index.html" width="100%" height="800px" frameborder="0"
+                        onload="console.log('Resources loaded successfully')" 
+                        onerror="console.error('Failed to load resources')"></iframe>
+            </div>
+        `;
+    }
+    
+    // Load Navi chat content
+    function loadNaviContent() {
+        const mainContent = document.getElementById("mainContent");
+        mainContent.innerHTML = `
+            <div class="section-header">
+                <h2>Chat with Navi</h2>
+                <p>Get personalized guidance and motivation</p>
+            </div>
+            <div class="navi-content">
+                <iframe src="../Navi/index.html" width="100%" height="800px" frameborder="0"
+                        onload="console.log('Navi chat loaded successfully')" 
+                        onerror="console.error('Failed to load Navi chat')"></iframe>
+            </div>
+            <button onclick="loadSectionContent('dashboard')" class="back-to-dashboard">← Back to Dashboard</button>
+            <style>
+                .back-to-dashboard {
+                    background: #FF9E00;
+                    color: white;
+                    padding: 10px 20px;
+                    border: none;
+                    border-radius: 5px;
+                    cursor: pointer;
+                    margin: 20px;
+                }
+                .back-to-dashboard:hover {
+                    background: #e68a00;
+                }
+            </style>
+        `;
+    }
+    
     // Assign click events to your nav buttons
     document.querySelectorAll(".nav-button").forEach((btn, index) => {
         btn.addEventListener("click", (e) => {
             e.preventDefault();
+            
+            console.log(`Navigation clicked: index ${index}`);
+            
+            // Remove active class from all buttons
+            document.querySelectorAll(".nav-button").forEach(b => b.classList.remove("active"));
+            // Add active class to clicked button
+            btn.classList.add("active");
 
-            if (index === 0) loadPage("../Dashboard/index.html");
-            if (index === 1) loadPage("../Career path/index.html");
-            if (index === 2) loadPage("../Career path/index.html");
-            if (index === 3) loadPage("../Resources/index.html");
+            if (index === 0) {
+                console.log('Loading dashboard...');
+                loadSectionContent('dashboard');
+            }
+            if (index === 1) {
+                console.log('Loading tasks...');
+                loadSectionContent('tasks');
+            }
+            if (index === 2) {
+                console.log('Loading career path...');
+                loadSectionContent('career-path');
+            }
+            if (index === 3) {
+                console.log('Loading resources...');
+                loadSectionContent('resources');
+            }
         });
     });
-
+    
     // Load dashboard by default
-    loadPage("../Dashboard/index.html");
+    loadSectionContent('dashboard');
 });
 
 // Add this at the top of your file
@@ -373,7 +690,7 @@ async function getTodaysTask() {
 /**
  * Display today's task
  */
-async function diaplayTodaysTask() {
+async function displayTodaysTask() {
   const task = await getTodaysTask();
 
   if (!task) {
@@ -457,15 +774,25 @@ async function completeTask() {
       // Show success message
       alert(result.message);
 
+      // Show success message
+      alert(result.message);
+
       // Refresh the task display to show next task
-      displayTodaysTask();
+      await displayTodaysTask();
+      
+      // Update progress section
+      await updateProgressSection();
+      
+      // Update charts
+      updateChartsWithRealData();
+      
     } else {
       console.error("Failed to complete task");
       alert("Failed to mark task as complete");
     }
   } catch (error) {
     console.error("Error completing task:", error);
-    alert("Error occured while completing task");
+    alert("Error occurred while completing task");
   }
 }
 
@@ -645,12 +972,23 @@ async function updateProgressSection() {
   }
 }
 
-// Modify the window.addEventListener to include the new function
-window.addEventListener("DOMContentLoaded", () => {
-  initCharts();
-  loadDailyTask().catch(showError);
-  loadCourses();
-  updateProgressSection(); // Add this line
+// Initialize dashboard when DOM is loaded
+window.addEventListener("DOMContentLoaded", async () => {
+  try {
+    // Initialize charts
+    initCharts();
+    
+    // Load user data
+    await displayTodaysTask();
+    await updateProgressSection();
+    await displayWeeklyVideos();
+    
+    // Update charts with real data
+    updateChartsWithRealData();
+    
+  } catch (error) {
+    console.error("Error initializing dashboard:", error);
+  }
 });
 
 // Add refresh function for periodic updates
@@ -661,15 +999,68 @@ function refreshProgressSection() {
 // Optional: Refresh every 5 minutes
 setInterval(refreshProgressSection, 300000);
 
+// Handle iframe loading errors
+function handleIframeError(section) {
+    console.error(`Failed to load ${section} iframe`);
+    const fallbackElement = document.getElementById(`${section}-fallback`);
+    if (fallbackElement) {
+        fallbackElement.style.display = 'block';
+    }
+}
+
+// Add iframe timeout handling
+function setupIframeTimeout(iframe, section, timeout = 10000) {
+    setTimeout(() => {
+        if (iframe.contentDocument && iframe.contentDocument.readyState === 'complete') {
+            console.log(`${section} loaded successfully`);
+        } else {
+            console.warn(`${section} loading timeout`);
+            handleIframeError(section);
+        }
+    }, timeout);
+}
+
+// Update charts with real data from backend
+async function updateChartsWithRealData() {
+  try {
+    const progress = await getUserProgress();
+    if (!progress) return;
+
+    // Update progress chart with real data
+    if (progressChart) {
+      const totalTasks = progress.total_tasks;
+      const completedTasks = progress.completed_tasks;
+      const inProgressTasks = Math.min(5, totalTasks - completedTasks);
+      const upcomingTasks = totalTasks - completedTasks - inProgressTasks;
+
+      progressChart.data.datasets[0].data = [completedTasks, inProgressTasks, upcomingTasks];
+      progressChart.update();
+    }
+
+    // Update momentum chart with weekly progress
+    if (momentumChart) {
+      // Get weekly progress data (you can enhance this with actual weekly data)
+      const weeklyProgress = [4.5, 6.5, 2.5, 5, 3, 0, 0];
+      momentumChart.data.datasets[0].data = weeklyProgress;
+      momentumChart.update();
+    }
+
+  } catch (error) {
+    console.error("Error updating charts with real data:", error);
+  }
+}
+
 // Add at the end of your existing JavaScript
 document.addEventListener("DOMContentLoaded", function () {
   const menuToggle = document.getElementById("menuToggle");
   const navigation = document.getElementById("navigation");
 
-  menuToggle.addEventListener("click", function () {
-    navigation.classList.toggle("active");
-    menuToggle.classList.toggle("active");
-  });
+  if (menuToggle) {
+    menuToggle.addEventListener("click", function () {
+      navigation.classList.toggle("active");
+      menuToggle.classList.toggle("active");
+    });
+  }
 
   // Close menu when clicking outside
   document.addEventListener("click", function (e) {
@@ -702,3 +1093,21 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 });
+
+function initializeRoadmap(roadmapData) {
+    const iframe = document.querySelector('.career-path-container iframe');
+    if (!iframe) return;
+
+    // Wait for iframe to load
+    iframe.addEventListener('load', () => {
+        try {
+            // Send roadmap data to iframe
+            iframe.contentWindow.postMessage({
+                type: 'INIT_ROADMAP',
+                data: roadmapData
+            }, '*');
+        } catch (error) {
+            console.error('Error initializing roadmap:', error);
+        }
+    });
+}

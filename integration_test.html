@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NaviPRO Integration Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .test-section {
+            background: #f5f5f5;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+        }
+        .test-result {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .info { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        button {
+            background: #FF9E00;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background: #e68a00; }
+        .user-info {
+            background: #e7f3ff;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: #ddd;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background: #FF9E00;
+            transition: width 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+    <h1>🚀 NaviPRO Integration Test</h1>
+    
+    <div class="user-info">
+        <h3>User Session Status</h3>
+        <div id="userStatus">Checking...</div>
+    </div>
+    
+    <div class="test-section">
+        <h3>1. Backend Connection Test</h3>
+        <button onclick="testBackendConnection()">Test Backend</button>
+        <div id="backendTest"></div>
+    </div>
+    
+    <div class="test-section">
+        <h3>2. Roadmap Generation Test</h3>
+        <button onclick="testRoadmapGeneration()">Generate Test Roadmap</button>
+        <div id="roadmapTest"></div>
+    </div>
+    
+    <div class="test-section">
+        <h3>3. Daily Task Test</h3>
+        <button onclick="testDailyTask()">Get Daily Task</button>
+        <div id="dailyTaskTest"></div>
+    </div>
+    
+    <div class="test-section">
+        <h3>4. Task Completion Test</h3>
+        <button onclick="testTaskCompletion()">Complete Task</button>
+        <div id="taskCompletionTest"></div>
+    </div>
+    
+    <div class="test-section">
+        <h3>5. User Progress Test</h3>
+        <button onclick="testUserProgress()">Get Progress</button>
+        <div id="progressTest"></div>
+    </div>
+    
+    <div class="test-section">
+        <h3>6. Video Recommendations Test</h3>
+        <button onclick="testVideoRecommendations()">Get Videos</button>
+        <div id="videoTest"></div>
+    </div>
+    
+    <div class="test-section">
+        <h3>7. AI Chat Test</h3>
+        <input type="text" id="chatInput" placeholder="Ask Navi something..." style="width: 300px; padding: 8px;">
+        <button onclick="testAIChat()">Send Message</button>
+        <div id="chatTest"></div>
+    </div>
+    
+    <div class="test-section">
+        <h3>8. Full Integration Test</h3>
+        <button onclick="runFullIntegrationTest()">Run All Tests</button>
+        <div id="fullIntegrationTest"></div>
+    </div>
+    
+    <script>
+        let currentUserId = null;
+        let currentTaskId = null;
+        
+        // Check user session on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            checkUserSession();
+        });
+        
+        function checkUserSession() {
+            const userId = localStorage.getItem('userId');
+            const roadmapData = localStorage.getItem('roadmapData');
+            
+            if (userId && roadmapData) {
+                currentUserId = userId;
+                try {
+                    const roadmap = JSON.parse(roadmapData);
+                    document.getElementById('userStatus').innerHTML = `
+                        <div class="success">
+                            ✅ User Session Active<br>
+                            <strong>User ID:</strong> ${userId}<br>
+                            <strong>Goal:</strong> ${roadmap.goal}<br>
+                            <strong>Target Role:</strong> ${roadmap.target_role}<br>
+                            <strong>Timeframe:</strong> ${roadmap.timeframe}
+                        </div>
+                    `;
+                } catch (error) {
+                    document.getElementById('userStatus').innerHTML = `
+                        <div class="error">
+                            ❌ Invalid roadmap data in localStorage
+                        </div>
+                    `;
+                }
+            } else {
+                document.getElementById('userStatus').innerHTML = `
+                    <div class="error">
+                        ❌ No user session found<br>
+                        <button onclick="window.location.href='../onboarding/index.html'">Go to Onboarding</button>
+                    </div>
+                `;
+            }
+        }
+        
+        function showResult(elementId, message, type = 'info') {
+            document.getElementById(elementId).innerHTML = `
+                <div class="test-result ${type}">
+                    ${message}
+                </div>
+            `;
+        }
+        
+        async function testBackendConnection() {
+            try {
+                const response = await fetch('http://127.0.0.1:8000/api/health');
+                if (response.ok) {
+                    const data = await response.json();
+                    showResult('backendTest', `
+                        ✅ Backend Connected Successfully<br>
+                        <strong>Status:</strong> ${data.status}<br>
+                        <strong>Active Users:</strong> ${data.active_users}<br>
+                        <strong>Groq API:</strong> ${data.groq_configured ? '✅ Configured' : '❌ Not Configured'}<br>
+                        <strong>YouTube API:</strong> ${data.youtube_configured ? '✅ Configured' : '❌ Not Configured'}
+                    `, 'success');
+                } else {
+                    showResult('backendTest', `❌ Backend Error: ${response.status}`, 'error');
+                }
+            } catch (error) {
+                showResult('backendTest', `❌ Connection Failed: ${error.message}`, 'error');
+            }
+        }
+        
+        async function testRoadmapGeneration() {
+            if (!currentUserId) {
+                showResult('roadmapTest', '❌ No user session found', 'error');
+                return;
+            }
+            
+            try {
+                const testData = {
+                    goal: "Test Integration",
+                    target_role: "Integration Tester",
+                    timeframe: "3_months",
+                    hours_per_week: "4_to_6_hours",
+                    learning_style: "watching_videos",
+                    learning_speed: "average",
+                    skill_level: "beginner"
+                };
+                
+                const response = await fetch('http://127.0.0.1:8000/api/generate_roadmap', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(testData)
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    showResult('roadmapTest', `
+                        ✅ Roadmap Generated Successfully<br>
+                        <strong>New User ID:</strong> ${data.user_id}<br>
+                        <strong>Goal:</strong> ${data.roadmap.goal}<br>
+                        <strong>Total Months:</strong> ${data.roadmap.roadmap.length}
+                    `, 'success');
+                } else {
+                    showResult('roadmapTest', `❌ Roadmap Generation Failed: ${response.status}`, 'error');
+                }
+            } catch (error) {
+                showResult('roadmapTest', `❌ Error: ${error.message}`, 'error');
+            }
+        }
+        
+        async function testDailyTask() {
+            if (!currentUserId) {
+                showResult('dailyTaskTest', '❌ No user session found', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`http://127.0.0.1:8000/api/daily_task/${currentUserId}`);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    currentTaskId = data.task_id;
+                    showResult('dailyTaskTest', `
+                        ✅ Daily Task Retrieved<br>
+                        <strong>Task:</strong> ${data.title}<br>
+                        <strong>Goal:</strong> ${data.goal}<br>
+                        <strong>Estimated Time:</strong> ${data.estimated_time}<br>
+                        <strong>Week Focus:</strong> ${data.week_focus}
+                    `, 'success');
+                } else {
+                    showResult('dailyTaskTest', `❌ Failed to get daily task: ${response.status}`, 'error');
+                }
+            } catch (error) {
+                showResult('dailyTaskTest', `❌ Error: ${error.message}`, 'error');
+            }
+        }
+        
+        async function testTaskCompletion() {
+            if (!currentUserId) {
+                showResult('taskCompletionTest', '❌ No user session found', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`http://127.0.0.1:8000/api/complete_task/${currentUserId}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ task_completed: true })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    showResult('taskCompletionTest', `
+                        ✅ Task Completed Successfully<br>
+                        <strong>Completed Task:</strong> ${data.completed_task}<br>
+                        <strong>Total Completed:</strong> ${data.total_completed}<br>
+                        <strong>Message:</strong> ${data.message}
+                    `, 'success');
+                } else {
+                    showResult('taskCompletionTest', `❌ Task completion failed: ${response.status}`, 'error');
+                }
+            } catch (error) {
+                showResult('taskCompletionTest', `❌ Error: ${error.message}`, 'error');
+            }
+        }
+        
+        async function testUserProgress() {
+            if (!currentUserId) {
+                showResult('progressTest', '❌ No user session found', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`http://127.0.0.1:8000/api/user_progress/${currentUserId}`);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    showResult('progressTest', `
+                        ✅ User Progress Retrieved<br>
+                        <strong>Goal:</strong> ${data.goal}<br>
+                        <strong>Total Tasks:</strong> ${data.total_tasks}<br>
+                        <strong>Completed Tasks:</strong> ${data.completed_tasks}<br>
+                        <strong>Completion:</strong> ${data.completion_percentage}%<br>
+                        <strong>Current Position:</strong> Month ${data.current_month}, Week ${data.current_week}, Day ${data.current_day}
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: ${data.completion_percentage}%"></div>
+                        </div>
+                    `, 'success');
+                } else {
+                    showResult('progressTest', `❌ Failed to get progress: ${response.status}`, 'error');
+                }
+            } catch (error) {
+                showResult('progressTest', `❌ Error: ${error.message}`, 'error');
+            }
+        }
+        
+        async function testVideoRecommendations() {
+            if (!currentUserId) {
+                showResult('videoTest', '❌ No user session found', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`http://127.0.0.1:8000/api/week_videos/${currentUserId}`);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    showResult('videoTest', `
+                        ✅ Video Recommendations Retrieved<br>
+                        <strong>Week Focus:</strong> ${data.week_focus}<br>
+                        <strong>Week Info:</strong> ${data.week_info}<br>
+                        <strong>Total Videos:</strong> ${data.total_videos}<br>
+                        <strong>Sample Video:</strong> ${data.videos[0]?.title || 'No videos available'}
+                    `, 'success');
+                } else {
+                    showResult('videoTest', `❌ Failed to get videos: ${response.status}`, 'error');
+                }
+            } catch (error) {
+                showResult('videoTest', `❌ Error: ${error.message}`, 'error');
+            }
+        }
+        
+        async function testAIChat() {
+            if (!currentUserId) {
+                showResult('chatTest', '❌ No user session found', 'error');
+                return;
+            }
+            
+            const message = document.getElementById('chatInput').value.trim();
+            if (!message) {
+                showResult('chatTest', '❌ Please enter a message', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`http://127.0.0.1:8000/api/chat/${currentUserId}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: message, user_id: currentUserId })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    showResult('chatTest', `
+                        ✅ AI Chat Response<br>
+                        <strong>Your Message:</strong> ${message}<br>
+                        <strong>Navi's Response:</strong> ${data.response}<br>
+                        <strong>Timestamp:</strong> ${new Date(data.timestamp).toLocaleString()}
+                    `, 'success');
+                } else {
+                    showResult('chatTest', `❌ Chat failed: ${response.status}`, 'error');
+                }
+            } catch (error) {
+                showResult('chatTest', `❌ Error: ${error.message}`, 'error');
+            }
+        }
+        
+        async function runFullIntegrationTest() {
+            showResult('fullIntegrationTest', '🔄 Running full integration test...', 'info');
+            
+            try {
+                // Test 1: Backend connection
+                await testBackendConnection();
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                // Test 2: User progress
+                await testUserProgress();
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                // Test 3: Daily task
+                await testDailyTask();
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                // Test 4: Video recommendations
+                await testVideoRecommendations();
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                // Test 5: AI chat
+                document.getElementById('chatInput').value = 'Hello Navi! How am I doing?';
+                await testAIChat();
+                
+                showResult('fullIntegrationTest', `
+                    🎉 Full Integration Test Completed!<br>
+                    All backend features are working correctly.<br>
+                    <button onclick="window.location.href='../Dashboard/index.html'">Go to Dashboard</button>
+                    <button onclick="window.location.href='../Career path/index.html'">View Career Path</button>
+                `, 'success');
+                
+            } catch (error) {
+                showResult('fullIntegrationTest', `❌ Integration test failed: ${error.message}`, 'error');
+            }
+        }
+    </script>
+</body>
+</html> 

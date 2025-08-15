@@ -99,6 +99,82 @@ body{
 
 .main-content {
     width: 75%;
+    height: 100vh;
+    overflow-y: auto;
+    background: #f8f9fa;
+}
+
+/* Section Headers */
+.section-header {
+    background: white;
+    padding: 30px;
+    border-bottom: 1px solid #e9ecef;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.section-header h2 {
+    color: #1A4156;
+    font-size: 2rem;
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+.section-header p {
+    color: #6c757d;
+    font-size: 1.1rem;
+    margin: 0;
+}
+
+/* Content Areas */
+.tasks-content,
+.career-path-content,
+.resources-content,
+.navi-content {
+    padding: 20px;
+    background: white;
+    margin: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+/* Iframe Styling */
+iframe {
+    border: none;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+/* Active Navigation State */
+.nav-button.active {
+    background: #FF9E00 !important;
+    color: #1A4156 !important;
+    border-radius: 8px;
+    transform: translateX(5px);
+    transition: all 0.3s ease;
+}
+
+.nav-button.active button {
+    color: #1A4156 !important;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .navigation {
+        width: 100%;
+        height: auto;
+        position: fixed;
+        bottom: 0;
+        z-index: 1000;
+    }
+    
+    .main-content {
+        width: 100%;
+        margin-left: 0;
+        margin-bottom: 80px;
+    }
+}
+.main-content {
+    width: 75%;
 }
 
 .icons{
@@ -112,7 +188,9 @@ body{
 
 .icons-left{
     display: flex;
+    flex-direction: row;
     align-items: center;
+    justify-content: space-between;
 }
 .left-icon{
     background: rgb(190, 190, 190);
@@ -458,10 +536,12 @@ p{
 .summary{
     display: flex;
     flex-direction: row;
+    justify-content: center;
     align-items: center;
     background: #E9EEF13D;
-    height: 130px;
+    height: 150px;
     border-radius: 18x;
+    margin-top: 3rem;
 }
 .summary-box{
     width: 100%;
